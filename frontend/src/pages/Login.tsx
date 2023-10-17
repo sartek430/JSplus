@@ -12,7 +12,7 @@ import {
   InputRightElement,
   Image,
 } from "@chakra-ui/react";
-import image from "../assets/image/Belle Nature 3560044.jpg";
+import image from "../assets/image/Orage.jpg";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -27,14 +27,18 @@ export default function Login() {
       password: password,
     };
 
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
     axios
       .post(
-        "https://226b-2a01-cb0c-1-3200-530-bf4d-5eb8-a411.ngrok-free.app/users",
+        "https://meteoplus.fly.dev/login",
         {
           data,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "ngrok-skip-browser-warning": "*",
+          },
         }
       )
       .then((response) => {
@@ -101,6 +105,7 @@ export default function Login() {
           _hover={{ borderColor: "#0E487D" }}
           onChange={(e) => setEmail(e.target.value)}
         />
+        
         <InputGroup alignItems="center" justifyContent={"center"}>
           <Input
             mt={"60px"}
@@ -155,7 +160,7 @@ export default function Login() {
           mt={"40px"}
         ></Box>
       </Flex>
-      <Image src={image} h={"100vh"}></Image>
+      <Image src={image} h={"100vh"} w={"43%"}></Image>
     </Flex>
   );
 }

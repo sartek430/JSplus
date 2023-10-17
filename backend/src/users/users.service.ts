@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ObjectLiteral, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -16,6 +16,9 @@ export class UsersService {
       ...createUserDto,
       password: bcrypt.hashSync(createUserDto.password, 8),
     });
+
+    const existingUser = await this.usersRepository.findBy({ email: user.email });
+    if (existingUser.length > 0) throw new ForbiddenException(['Email already used']);
 
     const newUser = await this.usersRepository.save(user);
     delete newUser.password;
@@ -40,7 +43,7 @@ export class UsersService {
 
   async update(updateUserDto: UpdateUserDto, user: IUserInfos) {
     const userToUpdate = await this.usersRepository.findOne({ where: { id: user.id } });
-    if (!userToUpdate) throw new Error('User not found');
+    if (!userToUpdate) throw new ForbiddenException(['User not found']);
 
     if (updateUserDto.password) updateUserDto.password = bcrypt.hashSync(updateUserDto.password, 8);
 

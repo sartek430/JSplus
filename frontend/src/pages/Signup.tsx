@@ -1,62 +1,69 @@
+import {
+  Flex,
+  Image,
+  Text,
+  Box,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Button,
+} from "@chakra-ui/react";
+import image from "../assets/image/Belle Nature 3560044.jpg";
 import { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useToast } from "@chakra-ui/react";
 import axios from "axios";
-import {
-  Flex,
-  Text,
-  Box,
-  Input,
-  Button,
-  InputGroup,
-  InputRightElement,
-  Image,
-} from "@chakra-ui/react";
-import image from "../assets/image/Belle Nature 3560044.jpg";
 
-export default function Login() {
+export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [repeatPassword, setRepeatPassword] = useState("");
   const toast = useToast();
 
-  const connection = (): void => {
-    const data = {
-      email: email,
-      password: password,
-    };
-
-    axios.defaults.headers.post["Content-Type"] =
-      "application/json;charset=utf-8";
-    axios.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
-    axios
-      .post(
-        "https://226b-2a01-cb0c-1-3200-530-bf4d-5eb8-a411.ngrok-free.app/users",
-        {
-          data,
-        }
-      )
-      .then((response) => {
-        // Gérer la réponse réussie ici
-        console.log("Utilisateur connecté :", response.data);
-        toast({
-          title: "Utilisateur connecté avec succès",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la connection de l'utilisateur :", error);
-        toast({
-          title: "Erreur lors de la connection de l'utilisateur",
-          description: error.message,
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+  const createAcount = (): void => {
+    if (password !== repeatPassword) {
+      toast({
+        title: "Mot de passe pas pareil.",
+        description: "Faut mettre les mêmes mot de passe partout !",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
       });
+    } else {
+      const data = {
+        email: email,
+        password: password,
+      };
+
+      axios.defaults.headers.post['Content-Type'] ='application/json;charset=utf-8';
+      axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
+      axios
+        .post("https://226b-2a01-cb0c-1-3200-530-bf4d-5eb8-a411.ngrok-free.app/users", {
+          data
+        })
+        .then((response) => {
+          // Gérer la réponse réussie ici
+          console.log("Utilisateur créé :", response.data);
+          toast({
+            title: "Utilisateur créé avec succès",
+            status: "success",
+            duration: 3000,
+            isClosable: true,
+          });
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la création de l'utilisateur :", error);
+          toast({
+            title: "Erreur lors de la création de l'utilisateur",
+            description: error.message, 
+            status: "error",
+            duration: 3000,
+            isClosable: true,
+          });
+        });
+    }
   };
 
   return (
@@ -79,7 +86,7 @@ export default function Login() {
           fontSize={"35px"}
           fontWeight={700}
         >
-          Connecte toi !
+          Bienvenue sur Météo+ !
         </Text>
         <Box
           w="45%"
@@ -129,9 +136,46 @@ export default function Login() {
             </Button>
           </InputRightElement>
         </InputGroup>
+        <InputGroup
+          alignItems="center"
+          justifyContent={"center"}
+          flexDirection={"column"}
+        >
+          <Text mr={130} fontWeight={"light"}>
+            Répéter mot de passe
+          </Text>
+          <Input
+            h="50px"
+            variant="outline"
+            w={"50%"}
+            bg={"#FFFFFF"}
+            borderColor={"#2583DA"}
+            _hover={{ borderColor: "#0E487D" }}
+            border={"2px"}
+            color={"#2583DA"}
+            type={showRepeatPassword ? "text" : "password"}
+            placeholder="Mot de passe"
+            onChange={(e) => setRepeatPassword(e.target.value)}
+          />
+          {/* affiche un bouton qui affiche ou non le mot de passe */}
+          <InputRightElement width="auto" m="5px">
+            <Button
+              onClick={() => setShowRepeatPassword(!showRepeatPassword)}
+              backdropFilter={"blur(10px)"}
+              mr={"170px"}
+              mt={"50px"}
+            >
+              {showRepeatPassword ? (
+                <AiOutlineEyeInvisible />
+              ) : (
+                <AiOutlineEye />
+              )}
+            </Button>
+          </InputRightElement>
+        </InputGroup>
 
         <Button
-          mt={"40px"}
+          mt={"60px"}
           w={"50%"}
           h={"50px"}
           bgGradient={"linear(to-r, #2583DA, #0E487D)"}
@@ -142,9 +186,9 @@ export default function Login() {
           }}
           _active={{ transform: "scale(1)" }}
           boxShadow={"-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"}
-          onClick={connection}
+          onClick={createAcount}
         >
-          Connexion !
+          Créer ton compte !
         </Button>
 
         <Box

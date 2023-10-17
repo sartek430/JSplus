@@ -11,15 +11,16 @@ import * as bcrypt from 'bcrypt';
 export class UsersService {
   constructor(@InjectRepository(User) private usersRepository: Repository<User>) { }
 
-  create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     const user = this.usersRepository.create({
       ...createUserDto,
       password: bcrypt.hashSync(createUserDto.password, 8),
     });
 
-    delete user.password;
+    const newUser = await this.usersRepository.save(user);
+    delete newUser.password;
 
-    return this.usersRepository.save(user);
+    return newUser;
   }
 
   findAll(inputQuery: ObjectLiteral): Promise<User[]> {

@@ -15,9 +15,4 @@ export class CreateUserDto {
   @IsString()
   @Length(8, 500)
   password: string;
-  
-  @IsOptional()
-  @IsString()
-  @Length(0, 500)
-  location?: string;
 }

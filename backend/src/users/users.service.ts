@@ -22,20 +22,13 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  async findAll(inputQuery: ObjectLiteral): Promise<User[]> {
-    const query: ObjectLiteral = {};
-
-    const qb = this.usersRepository.createQueryBuilder('user');
+  findAll(inputQuery: ObjectLiteral): Promise<User[]> {
+    const qb = this.usersRepository.createQueryBuilder('user').select(['user.id', 'user.name', 'user.email']);
 
     if (!!inputQuery.name) qb.where('user.name LIKE :name', { name: `%${inputQuery.name}%` });
     if (!!inputQuery.email) qb.andWhere('user.email LIKE :email', { email: `%${inputQuery.email}%` });
 
-    const users = await qb.getMany();
-
-    return users.map((user) => {
-      delete user.password;
-      return user;
-    });
+    return qb.getMany();
   }
 
   async findOneByEmail(email: string): Promise<User> {
@@ -48,7 +41,9 @@ export class UsersService {
     const userToUpdate = await this.usersRepository.findOne({ where: { id: user.id } });
     if (!userToUpdate) throw new Error('User not found');
 
-    const updatedUser = await this.usersRepository.save({ ...userToUpdate, ...updateUserDto });
+    if (updateUserDto.password) updateUserDto.password = bcrypt.hashSync(updateUserDto.password, 8);
+
+    const updatedUser = await this.usersRepository.save({ ...userToUpdate, ...updateUserDto, id: user.id });
 
     return updatedUser;
   }

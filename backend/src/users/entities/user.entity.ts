@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { Widget } from "src/widgets/entities/widget.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity("users")
 export class User {
@@ -14,6 +15,6 @@ export class User {
   @Column({ length: 500 })
   password: string;
 
-  @Column({ length: 500, nullable: true })
-  location?: string;
+  @OneToMany(() => Widget, (widget) => widget.user)
+  widgets: Widget[];
 }

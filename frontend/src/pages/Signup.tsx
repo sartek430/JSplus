@@ -106,7 +106,7 @@ export default function Signup() {
         );
         toast({
           title: "Erreur lors de la création de l'utilisateur",
-          description: error.response.data.message,
+          description: error.response.data.message[0],
           status: "error",
           duration: 3000,
           isClosable: true,

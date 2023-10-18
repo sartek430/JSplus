@@ -3,7 +3,7 @@ import {
   Avatar,
   Box,
   Divider,
-  Flex, Link,
+  Flex, Image, Link,
   Modal,
   ModalBody, ModalCloseButton,
   ModalContent, ModalHeader,
@@ -14,8 +14,10 @@ import {
 import { useEffect, useState } from 'react';
 import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
-
-
+import sunny from '../assets/image/icons/sun.png';
+import cloudy from '../assets/image/icons/cloudy.png';
+import rain from '../assets/image/icons/rain.png';
+import storm from '../assets/image/icons/storm.png';
 
 function HomePage() {
   const [widgets, setWidgets] = useState<any[]>([]);
@@ -74,17 +76,23 @@ function HomePage() {
 
       const date = `${year}-${month}-${day}T${hours}:00`
 
+      const i = weather.hourly.time.indexOf(date) + 1
+
       return {
         ...widget,
-        temperature: weather.hourly.temperature_2m[weather.hourly.time.indexOf(date) + 1],
-        humidity: weather.hourly.relativehumidity_2m[weather.hourly.time.indexOf(date) + 1],
-        wind: weather.hourly.windspeed_10m[weather.hourly.time.indexOf(date) + 1]
+        temperature: weather.hourly.temperature_2m[i],
+        humidity: weather.hourly.relativehumidity_2m[i],
+        wind: weather.hourly.windspeed_10m[i],
+        isSunny: weather.hourly.weathercode[i] >= 0 && weather.hourly.weathercode[i] <= 3,
+        isCloudy: weather.hourly.weathercode[i] >= 4 && weather.hourly.weathercode[i] <= 60,
+        isRainy: weather.hourly.weathercode[i] >= 61 && weather.hourly.weathercode[i] <= 86,
+        isStormy: weather.hourly.weathercode[i] >= 87 && weather.hourly.weathercode[i] <= 99,
       }
     })));
   }
 
   const getWeather = async (lat: string, long: string) => {
-    const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=temperature_2m,relativehumidity_2m,precipitation,windspeed_10m&timezone=Europe%2FLondon`, {
+    const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=temperature_2m,relativehumidity_2m,weathercode,windspeed_10m&timezone=Europe%2FLondon`, {
       method: "GET",
     })
 
@@ -233,7 +241,10 @@ function HomePage() {
             <div style={{ display: "flex", flexDirection: "row" }}>
               <div style={{ marginLeft: "10px" }}>
                 <p style={{ fontSize: "20px" }}>{widget.displayName}</p>
-                <p style={{ fontSize: "35px", fontWeight: "bold" }}>{!widget.temperature ? <Spinner /> : widget.temperature}°C</p>
+                <Flex flexDirection="row" alignItems={"center"}>
+                  <Image src={widget.isSunny ? sunny : widget.isCloudy ? cloudy : widget.isRainy ? rain : storm} alt="weather" width={widget.size === "SMALL" ? "50px" : "100px"} style={{ marginRight: "10px" }} />
+                  <p style={{ fontSize: "35px", fontWeight: "bold" }}>{!widget.temperature ? <Spinner /> : widget.temperature}°C</p>
+                </Flex>
               </div>
             </div>
             {widget.size !== "SMALL" && (

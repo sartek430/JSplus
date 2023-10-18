@@ -8,11 +8,13 @@ import {
   InputRightElement,
   Button,
 } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
 import image from "../assets/image/Belle Nature 3560044.jpg";
 import { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useToast } from "@chakra-ui/react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,6 +22,7 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const toast = useToast();
+  const navigate = useNavigate();
 
   const createAcount = (): void => {
     if(email === "" || password === "" || username === ""){
@@ -58,6 +61,44 @@ export default function Signup() {
           duration: 3000,
           isClosable: true,
         });
+
+        axios
+      .post(
+        "https://meteoplus.fly.dev/login",
+        {
+          email: email,
+          password: password,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "ngrok-skip-browser-warning": "*",
+          },
+        }
+      )
+      .then((response) => {
+        console.log("Utilisateur connecté :", response.data);
+        toast({
+          title: "Utilisateur connecté avec succès",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        localStorage.setItem("token", response.data.token);
+        navigate("/accueil");
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la connection de l'utilisateur :", error);
+        toast({
+          title: "Erreur lors de la connection de l'utilisateur",
+          description: error.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      });
+
       })
       .catch((error) => {
         console.error(
@@ -159,6 +200,20 @@ export default function Signup() {
             </Button>
           </InputRightElement>
         </InputGroup>
+
+        <Text textAlign="center">
+          <Text as="span">Tu as déjà un compte ?</Text>{" "}
+          <Link to="/login">
+            <Text
+              as="span"
+              color="brand.500"
+              textDecoration={"none"}
+              fontWeight={"bold"}
+            >
+              Connecte toi !
+            </Text>
+          </Link>
+        </Text>
 
         <Button
           mt={"60px"}

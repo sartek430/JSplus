@@ -66,7 +66,7 @@ export default function Login() {
         console.error("Erreur lors de la connection de l'utilisateur :", error);
         toast({
           title: "Erreur lors de la connection de l'utilisateur",
-          description: error.message,
+          description: error.response.data.message,
           status: "error",
           duration: 3000,
           isClosable: true,

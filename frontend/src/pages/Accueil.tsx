@@ -1,29 +1,35 @@
-import { EmailIcon } from '@chakra-ui/icons';
 import {
   Avatar,
   Box,
-  Divider,
-  Flex, Image, Link,
+  Button,
+  Flex,
+  Image,
+  Input,
+  Link,
   Modal,
-  ModalBody, ModalCloseButton,
-  ModalContent, ModalHeader,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
   ModalOverlay,
   Spinner,
+  Text,
   useToast
-} from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+} from "@chakra-ui/react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
-import 'react-datepicker/dist/react-datepicker.css';
-import sunny from '../assets/image/icons/sun.png';
-import cloudy from '../assets/image/icons/cloudy.png';
-import rain from '../assets/image/icons/rain.png';
-import storm from '../assets/image/icons/storm.png';
+import "react-datepicker/dist/react-datepicker.css";
+import image from "../assets/image/Beautiful Weather.jpg";
+import cloudy from "../assets/image/icons/cloudy.png";
+import rain from "../assets/image/icons/rain.png";
+import storm from "../assets/image/icons/storm.png";
+import sunny from "../assets/image/icons/sun.png";
 
 function HomePage() {
   const [widgets, setWidgets] = useState<any[]>([]);
   const [loadingWidgets, setLoadingWidgets] = useState(true);
   const [loadingCreateWidgets, setLoadingCreateWidgets] = useState(false);
-  const [weatherData, setWeatherData] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
@@ -41,13 +47,56 @@ function HomePage() {
   };
 
   const handleDateChange = (date: Date | null) => {
-    if (!date) return
+    if (!date) return;
     setSelectedDate(date);
   };
 
   const currentDate = new Date();
   const maxDate = new Date(currentDate);
   maxDate.setDate(currentDate.getDate() + 6);
+  const [email, setEmail] = useState("");
+
+  const sendInvit = async () => {
+    if (email === "") {
+      toast({
+        title: "Erreur lors de l'envoi de l'invitation",
+        description: "L'adresse mail est vide",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    axios.post("https://meteoplus.fly.dev/invits", {
+      email: email,
+    },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+      .then((response) => {
+        console.log(response);
+        closeModal();
+        toast({
+          title: "Invitation envoyée avec succès",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      })
+      .catch((error) => {
+        console.error(error);
+        toast({
+          title: "Erreur lors de l'envoi de l'invitation",
+          description: error.response.data.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      });
+  };
 
   const getWigets = async () => {
     const token = localStorage.getItem('token')
@@ -98,7 +147,6 @@ function HomePage() {
 
     return await response.json()
   }
-
 
   const getCity = async () => {
     try {
@@ -152,7 +200,6 @@ function HomePage() {
     setLoadingCreateWidgets(false);
   };
 
-
   useEffect(() => {
     getWigets()
   }, [selectedDate]);
@@ -160,39 +207,44 @@ function HomePage() {
 
   return (
     <div>
+      <Image src={image} position={"absolute"} zIndex={-10} h={"100vh"} w={"100%"}></Image>
       <Flex
         as="nav"
         align="center"
         justify="space-between"
         padding="1rem"
-        borderBottom="1px solid #e0e0e0"
-        backgroundColor="teal.500"
+        backgroundColor="#e0e0e050"
+        backdropBlur={"blur(30px)"}
       >
         <Flex justify="space-between" width="15%">
-          <Link href="/about" color="white" textDecoration="none" >
+          <Link href="/about" color="white" textDecoration="none">
             Tableau de bord
           </Link>
           <Link href="/contact" color="white" textDecoration="none">
             Autre
           </Link>
         </Flex>
-        <DatePicker
-          selected={selectedDate}
-          onChange={(date) => handleDateChange(date)}
-          isClearable
-          minDate={currentDate}
-          maxDate={maxDate}
-          showYearDropdown
-          showMonthDropdown
-          showTimeSelect
-          dateFormat="dd/MM/yyyy-HH'h'"
-        />
-        <Flex justify="space-between" width="4.5%">
+        <Flex>
+          <DatePicker
+            selected={selectedDate}
+            onChange={(date) => handleDateChange(date)}
+            isClearable
+            minDate={currentDate}
+            maxDate={maxDate}
+            showYearDropdown
+            showMonthDropdown
+            showTimeSelect
+            dateFormat="dd/MM/yyyy-HH'h'"
+          />
+        </Flex>
+        <Flex justify="space-between">
           <Link onClick={openModal} color="white" textDecoration="none">
-            <EmailIcon boxSize={7} />
+            <Text mr={10} fontSize={20}>
+              Inviter
+            </Text>
           </Link>
           <Link href="/profile" color="white" textDecoration="none">
-            <Avatar bg='#CBD5E0' boxSize={7} />
+            <Avatar bg="#CBD5E0" boxSize={7} />
           </Link>
         </Flex>
       </Flex>
@@ -200,12 +252,33 @@ function HomePage() {
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Messages</ModalHeader>
+          <ModalHeader fontSize={25} fontWeight={"bold"}>
+            Créer une Invitation
+          </ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <p>Demande d'invitation : Jules vous à inviter à rejoindre son tableau de bord !</p>
-            <Divider my={3} />
-            <p>Demande d'invitation : Hugo vous à inviter à rejoindre son tableau de bord !</p>
+            <Flex flexDirection={"column"} alignItems={"center"}>
+              <Box
+                w={"80%"}
+                h={1}
+                bg={"#0E487D"}
+                mt={"-10px"}
+                mb={"20px"}
+                borderRadius={"full"}
+              />
+              <Text alignSelf={"baseline"} fontSize={20} fontWeight={"bold"}>
+                Insérer addresse mail{" "}
+              </Text>
+              <Input
+                mt={5}
+                mb={5}
+                placeholder="Addresse mail"
+                onChange={(e) => setEmail(e.target.value)}
+              ></Input>
+              <Button alignSelf={"end"} mt={"20px"} onClick={sendInvit}>
+                Inviter
+              </Button>
+            </Flex>
           </ModalBody>
         </ModalContent>
       </Modal>
@@ -226,8 +299,8 @@ function HomePage() {
           />
         ) : widgets.length > 0 ? widgets.map((widget: any) => (
           <Box
-            bg="#e0e0e0"
-            boxShadow="-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"
+            bg="#e0e0e010"
+            backdropFilter={"blur(30px)"}
             borderRadius={20}
             p={4}
             width={widget.size === "SMALL" ? "15%" : "40%"}
@@ -257,8 +330,8 @@ function HomePage() {
         )) : <p>Vous n'avez pas encore de widgets.</p>}
 
         <Box
-          bg={"#e0e0e0"}
-          boxShadow={"-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"}
+          bg={"#e0e0e010"}
+          backdropFilter={"blur(30px)"}
           borderRadius={20}
           p={4}
           width="15%"
@@ -269,7 +342,6 @@ function HomePage() {
           flexDirection="column"
           justifyContent="space-evenly"
         >
-
           <div style={{ marginLeft: "10px" }}>
             <h1>Créer un Widget</h1>
             {loadingCreateWidgets ? (
@@ -308,11 +380,8 @@ function HomePage() {
             )}
           </div>
         </Box>
-
       </Flex>
-
     </div>
-
   );
 }
 

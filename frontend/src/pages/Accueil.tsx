@@ -280,7 +280,6 @@ function HomePage() {
           <Box
             bg="#e0e0e010"
             backdropFilter={"blur(30px)"}
-            boxShadow="-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"
             borderRadius={20}
             p={4}
             width={widget.size === "SMALL" ? "15%" : "40%"}

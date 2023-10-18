@@ -1,23 +1,12 @@
-import { Box, Text } from "@chakra-ui/react";
-import React, { useState, useEffect } from "react";
 import {
-  Button,
-  Flex,
-  Link,
-  Avatar,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton,
-  Modal,
-  Input,
-  Image,
-  useToast,
+  Avatar, Box, Button,
+  Flex, Image, Input, Link, Modal, ModalBody,
+  ModalCloseButton, ModalContent,
+  ModalHeader, ModalOverlay, Spinner, Text, useToast
 } from "@chakra-ui/react";
-import { EmailIcon } from "@chakra-ui/icons";
-import DatePicker from "react-datepicker";
 import axios from "axios";
+import { useEffect, useState } from "react";
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import image from "../assets/image/Beautiful Weather.jpg";
 
@@ -51,7 +40,6 @@ function HomePage() {
   const maxDate = new Date(currentDate);
   maxDate.setDate(currentDate.getDate() + 6);
   const [email, setEmail] = useState("");
-  const toast = useToast();
 
   const sendInvit = async () => {
     if(email === ""){
@@ -138,9 +126,6 @@ function HomePage() {
 
     return await response.json()
   }
-
-    setWeatherData(await response.json());
-  };
 
   const getCity = async () => {
     try {

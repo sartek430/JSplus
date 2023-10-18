@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ObjectLiteral, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -6,10 +6,14 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
 import { IUserInfos } from 'src/decorators/user.decorator';
 import * as bcrypt from 'bcrypt';
+import { ContactsService } from 'src/contacts/contacts.service';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(User) private usersRepository: Repository<User>) { }
+  constructor(
+    @InjectRepository(User) private usersRepository: Repository<User>,
+    @Inject(ContactsService) private contactsService: ContactsService,
+  ) { }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = this.usersRepository.create({
@@ -26,13 +30,26 @@ export class UsersService {
     return newUser;
   }
 
-  findAll(inputQuery: ObjectLiteral): Promise<User[]> {
-    const qb = this.usersRepository.createQueryBuilder('user').select(['user.id', 'user.name', 'user.email']);
+  async findAll(inputQuery: ObjectLiteral, user: IUserInfos): Promise<User[]> {
+    const qb = this.usersRepository
+      .createQueryBuilder('user')
+      .select(['user.id', 'user.name', 'user.email'])
+      .leftJoinAndSelect('user.widgets', 'widget')
 
     if (!!inputQuery.name) qb.where('user.name LIKE :name', { name: `%${inputQuery.name}%` });
     if (!!inputQuery.email) qb.andWhere('user.email LIKE :email', { email: `%${inputQuery.email}%` });
 
-    return qb.getMany();
+    const contacts = await this.contactsService.findAll(user);
+
+    const users = (await qb.getMany()).map((userFound) => {
+      const contact = contacts.find((contact) => contact.userIdA === userFound.id || contact.userIdB === userFound.id);
+
+      if (!contact) delete userFound.widgets;
+
+      return userFound;
+    });
+
+    return users;
   }
 
   async findOneByEmail(email: string): Promise<User> {

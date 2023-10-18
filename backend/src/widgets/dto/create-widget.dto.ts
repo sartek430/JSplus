@@ -1,7 +1,12 @@
-import { IsIn, IsLatitude, IsLongitude, IsNotEmpty, IsString } from "class-validator";
+import { IsIn, IsLatitude, IsLongitude, IsNotEmpty, IsOptional, IsString, Length } from "class-validator";
 import { EWidgetSize } from "../models";
 
 export class CreateWidgetDto {
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  displayName: string;
+
   @IsNotEmpty()
   @IsLatitude()
   latitude: number;

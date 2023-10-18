@@ -22,16 +22,24 @@ export default function Login() {
   const toast = useToast();
 
   const connection = (): void => {
-    const data = {
-      email: email,
-      password: password,
-    };
+
+    if (email === "" || password === "") {
+      toast({
+        title: "Erreur lors de la connection de l'utilisateur",
+        description: "Un des champs est vide",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
 
     axios
       .post(
         "https://meteoplus.fly.dev/login",
         {
-          data,
+          email: email,
+          password: password,
         },
         {
           headers: {

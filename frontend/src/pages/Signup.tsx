@@ -32,17 +32,14 @@ export default function Signup() {
       });
       return;
     }
-    const data = {
-      email: email,
-      password: password,
-      name: username,
-    };
 
     axios
       .post(
         "https://meteoplus.fly.dev/users",
         {
-          data,
+            email: email,
+            password: password,
+            name: username,
         },
         {
           headers: {

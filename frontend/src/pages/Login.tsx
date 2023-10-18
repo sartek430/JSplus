@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 import { useToast } from "@chakra-ui/react";
+import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import {
   Flex,
@@ -18,11 +20,10 @@ export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigate = useNavigate();
   const toast = useToast();
 
   const connection = (): void => {
-
     if (email === "" || password === "") {
       toast({
         title: "Erreur lors de la connection de l'utilisateur",
@@ -50,7 +51,6 @@ export default function Login() {
         }
       )
       .then((response) => {
-        // Gérer la réponse réussie ici
         console.log("Utilisateur connecté :", response.data);
         toast({
           title: "Utilisateur connecté avec succès",
@@ -58,6 +58,9 @@ export default function Login() {
           duration: 3000,
           isClosable: true,
         });
+        localStorage.setItem("token", response.data.access_token);
+        console.log("token :", response.data.access_token);
+        navigate("/accueil");
       })
       .catch((error) => {
         console.error("Erreur lors de la connection de l'utilisateur :", error);
@@ -113,11 +116,10 @@ export default function Login() {
           _hover={{ borderColor: "#0E487D" }}
           onChange={(e) => setEmail(e.target.value)}
         />
-        
+
         <InputGroup alignItems="center" justifyContent={"center"}>
           <Input
             mt={"60px"}
-            mb={"40px"}
             h="50px"
             variant="outline"
             w={"50%"}
@@ -142,6 +144,20 @@ export default function Login() {
             </Button>
           </InputRightElement>
         </InputGroup>
+
+        <Text textAlign="center" mt={"30px"}>
+          <Text as="span">Tu n'as pas de compte ?</Text>{" "}
+          <Link to="/signup">
+            <Text
+              as="span"
+              color="brand.500"
+              textDecoration={"none"}
+              fontWeight={"bold"}
+            >
+              Inscris toi !
+            </Text>
+          </Link>
+        </Text>
 
         <Button
           mt={"40px"}

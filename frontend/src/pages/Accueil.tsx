@@ -3,28 +3,14 @@ import {
   Text,
 } from '@chakra-ui/react';
 import React, { useState, useEffect } from 'react';
-import { Button, Flex, Link, Avatar, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Modal, Divider    } from '@chakra-ui/react';
+import { Button, Flex, Link, Avatar, ModalOverlay, ModalContent, ModalHeader, ModalBody, ModalCloseButton, Modal, Divider } from '@chakra-ui/react';
 import { EmailIcon } from '@chakra-ui/icons';
 import DatePicker from "react-datepicker";
 import 'react-datepicker/dist/react-datepicker.css';
 
 
 
-function getCurrentDateTime() {
-  const now = new Date();
-  const year = now.getFullYear();
-  const month = (now.getMonth() + 1).toString().padStart(2, '0'); // Mois commence à 0, donc ajoutez 1
-  const day = now.getDate().toString().padStart(2, '0');
-  const hours = now.getHours().toString().padStart(2, '0');
-  const minutes = now.getMinutes().toString().padStart(2, '0');
-
-  return `${year}-${month}-${day}T${hours}:00`;
-}
-
-
 function HomePage() {
-
-
 
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -36,35 +22,45 @@ function HomePage() {
     setIsModalOpen(false);
   };
 
-
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const handleDateChange = (date: Date | null) => {
-    if(!date) return
+    if (!date) return
     setSelectedDate(date);
   };
+
+  const currentDate = new Date();
+  const maxDate = new Date(currentDate);
+  maxDate.setDate(currentDate.getDate() + 6);
+
+  const year = selectedDate.getFullYear();
+  const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0'); // Mois commence à 0, donc ajoutez 1
+  const day = selectedDate.getDate().toString().padStart(2, '0');
+  const hours = selectedDate.getHours().toString().padStart(2, '0');
+
+  const date = `${year}-${month}-${day}T${hours}:00`;
 
 
   const [widgets, setWidgets] = useState([]);
   const [loadingWeather, setLoadingWeather] = useState(true);
 
 
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [weatherData, setWeatherData] = useState<any>(null);
 
-  const getWigets = async() => {
-    const response = await fetch("https://meteoplus.fly.dev/widgets", { 
+  const getWigets = async () => {
+    const response = await fetch("https://meteoplus.fly.dev/widgets", {
       method: "GET",
-      headers: {"Authorization":"Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqdWxlc0BqdWxlcy5qdSIsIm5hbWUiOiJKdWxlcyIsImlhdCI6MTY5NzQ4NDA1MCwiZXhwIjoxNzI5MDIwMDUwfQ.pxFcgg7dHgp_6tsJ-gQfTrU5916147EcAXOMAqYpQOoo8gQ9Z07K-9VcrxxWvN8XJfbRT-leeR6wnkK3ZBpGChiYuRxfdGT3M8BVblgNNKJpFPj6PKPkjdbKuSFVXNtQWhnZBTjQPX_wLfGNW1h8KqN7Iyi3yx27yWrgQk6YzJvbhCi9w4gyJswIFIOGk8GLiOabfR_1UUkH6MTshfh-1CckExYBCDn92GXPSmncZH2g_gYSoxBKOByjjZpHs3245XBqpHhWtlm4cgm3ZyhX6accqg0IOipIkj25ZagjeSI3E2dld4YD7OLvNlc9czvEnSuv7gR_7ekom-yywc77SQ",
-      "ngrok-skip-browser-warning":"*",
-      'Access-Control-Allow-Origin': '*'}
+      headers: {
+        "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJqdWxlc3NvcmVuc0BnbWFpbC5jb20iLCJuYW1lIjoiSnVsZXMiLCJpYXQiOjE2OTc2MjExNTMsImV4cCI6MTcyOTE1NzE1M30.N-PAEuikOLqyhV7JZWsWMzcos4fz3M3Bs-LlO_lgD-fkhcMfPfholzDZX0RPBM8a-sYCI5IjY8mh_KGKulrgxP45lWwYDdVFP8Se_-Mw7M6MEmzbFpndUdl7FEnR4lKDBJE8-Vs09fEeYXWHvdtXx9dQzxWQzDt3VVBhL67DKyARRFFl97WNwS75rL7RceKSacvs3GV-Xzm2oXpurCWqJSgPZ22Lc7v_SRsHXr49CRuB2aD9k7hs4X5IH-ddYFHN96csAiEELKGrFQa06tJD5nR-p_CJizKrrWC32BzI25ptYrskARZlaUiFlt3uFQ5ZfteHUe_S87n-apfASi1cbw",
+        "ngrok-skip-browser-warning": "*",
+        'Access-Control-Allow-Origin': '*'
+      }
     })
     console.log(await response.json())
   }
 
-  const getWeather = async() => {
-    const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=50.6495&longitude=3.113&hourly=temperature_2m,relativehumidity_2m,precipitation,windspeed_10m&timezone=Europe%2FLondon", { 
+  const getWeather = async () => {
+    const response = await fetch("https://api.open-meteo.com/v1/forecast?latitude=50.6495&longitude=3.113&hourly=temperature_2m,relativehumidity_2m,precipitation,windspeed_10m&timezone=Europe%2FLondon", {
       method: "GET",
     })
 
@@ -72,15 +68,51 @@ function HomePage() {
   }
 
 
-  const currentDateTime = getCurrentDateTime();
+  const getcity = async () => {
+    const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${ville}&count=1&language=fr&format=json`, {
+      method: "GET",
+    })
 
-  
+    setCityData(await response.json())
+    console.log(JSON.stringify(cityData.latitude))
+  }
+
+
+  const [taille, setTaille] = useState('petit');
+  const [ville, setVille] = useState('');
+  const [cityData, setCityData] = useState<any>(null);
+  const [latitude, setLatitude] = useState();
+  const [longitude, setLongitude] = useState();
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+
+    // Validez les données ici, par exemple, vérifiez si la ville existe et si son nom commence par une majuscule.
+
+    if (ville && /^[A-Z][a-z]*$/.test(ville)) {
+      // Effectuez ici ce que vous souhaitez avec les données valides, par exemple, envoyez-les au serveur.
+      console.log(`Taille : ${taille}, Ville : ${ville}`);
+      getcity()
+      const response = fetch("https://meteoplus.fly.dev/widgets", {
+        method: "POST",
+        headers: {
+          "Authorization": "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJqdWxlc3NvcmVuc0BnbWFpbC5jb20iLCJuYW1lIjoiSnVsZXMiLCJpYXQiOjE2OTc2MjExNTMsImV4cCI6MTcyOTE1NzE1M30.N-PAEuikOLqyhV7JZWsWMzcos4fz3M3Bs-LlO_lgD-fkhcMfPfholzDZX0RPBM8a-sYCI5IjY8mh_KGKulrgxP45lWwYDdVFP8Se_-Mw7M6MEmzbFpndUdl7FEnR4lKDBJE8-Vs09fEeYXWHvdtXx9dQzxWQzDt3VVBhL67DKyARRFFl97WNwS75rL7RceKSacvs3GV-Xzm2oXpurCWqJSgPZ22Lc7v_SRsHXr49CRuB2aD9k7hs4X5IH-ddYFHN96csAiEELKGrFQa06tJD5nR-p_CJizKrrWC32BzI25ptYrskARZlaUiFlt3uFQ5ZfteHUe_S87n-apfASi1cbw",
+          "ngrok-skip-browser-warning": "*",
+          'Access-Control-Allow-Origin': '*',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ latitude: 50, longitude: 10, size: taille })
+      })
+    } else {
+      console.error('Les données du formulaire sont incorrectes.');
+    }
+  };
 
 
   useEffect(() => {
     getWigets()
     getWeather()
-    console.log(currentDateTime);
+    console.log(selectedDate);
   }, []);
 
 
@@ -94,7 +126,7 @@ function HomePage() {
         borderBottom="1px solid #e0e0e0"
         backgroundColor="teal.500"
       >
-        <Flex justify="space-between" width="7%">
+        <Flex justify="space-between" width="15%">
           <Link href="/about" color="white" textDecoration="none" >
             Tableau de bord
           </Link>
@@ -102,14 +134,25 @@ function HomePage() {
             Autre
           </Link>
         </Flex>
+        <DatePicker
+          selected={selectedDate}
+          onChange={(date) => handleDateChange(date)}
+          isClearable
+          minDate={currentDate}
+          maxDate={maxDate}
+          showYearDropdown
+          showMonthDropdown
+          showTimeSelect
+          dateFormat="dd/MM/yyyy-HH'h'"
+        />
         <Flex justify="space-between" width="4.5%">
           <Link onClick={openModal} color="white" textDecoration="none">
-            <EmailIcon boxSize={7}  />
+            <EmailIcon boxSize={7} />
           </Link>
           <Link href="/profile" color="white" textDecoration="none">
             <Avatar bg='#CBD5E0' boxSize={7} />
           </Link>
-        </Flex> 
+        </Flex>
       </Flex>
 
       <Modal isOpen={isModalOpen} onClose={closeModal}>
@@ -126,15 +169,11 @@ function HomePage() {
       </Modal>
 
       <Flex
-      display="flex"
-      justify="space-evenly"
-      flexWrap="wrap"
+        display="flex"
+        justify="space-evenly"
+        flexWrap="wrap"
       >
 
-        {weatherData == null?"chargement":JSON.stringify(weatherData.hourly.time.indexOf(currentDateTime))
-        
-        }
-
         <Box
           bg="#e0e0e0"
           boxShadow="-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"
@@ -150,68 +189,18 @@ function HomePage() {
         >
           <div style={{ display: "flex", flexDirection: "row" }}>
             <div style={{ marginLeft: "10px" }}>
-              <p style={{ fontSize: "20px"}}>Lille</p>
-              <p style={{ fontSize: "35px", fontWeight: "bold" }}>{weatherData == null?"chargement":JSON.stringify(weatherData.hourly.temperature_2m[0])}</p>
-              <p>min : 12°C</p>
-              <p>max : 25°C</p>
+              <p style={{ fontSize: "20px" }}>VILLE</p>
+              <p style={{ fontSize: "35px", fontWeight: "bold" }}>{weatherData == null ? "chargement" : JSON.stringify(weatherData.hourly.temperature_2m[weatherData.hourly.time.indexOf(date) + 1])}°C</p>
             </div>
           </div>
-          <div style={{ fontSize: "20px", textAlign: "left", lineHeight: "40px"}}>
-            <DatePicker
-                selected={selectedDate}
-                onChange={(date) => handleDateChange(date)}
-                isClearable
-                showYearDropdown
-                showMonthDropdown
-                dateFormat="dd/MM/yyyy"
-              />
-            <p>Humidité : 25%</p>
-            <p>Vent : Calme</p>
-            <p>Pression : 1013 hPa</p>
+          <div style={{ fontSize: "20px", textAlign: "left", lineHeight: "40px" }}>
+            <p>Humidité : {weatherData == null ? "chargement" : JSON.stringify(weatherData.hourly.relativehumidity_2m[weatherData.hourly.time.indexOf(date) + 1])}%</p>
+            <p>Vent : {weatherData == null ? "chargement" : JSON.stringify(weatherData.hourly.windspeed_10m[weatherData.hourly.time.indexOf(date) + 1])}Km/h</p>
           </div>
         </Box>
 
-
-
         <Box
-          bg="#e0e0e0"
-          boxShadow="-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"
-          borderRadius={20}
-          p={4}
-          width="40%"
-          h="200px"
-          margin="50px"
-          flexDirection="row"
-          justifyContent="space-evenly"
-          display="flex"
-          alignItems="center"
-        >
-          <div style={{ display: "flex", flexDirection: "row" }}>
-            <div style={{ marginLeft: "10px" }}>
-              <p style={{ fontSize: "20px"}}>Lille</p>
-              <p style={{ fontSize: "35px", fontWeight: "bold" }}>20°C</p>
-              <p>min : 12°C</p>
-              <p>max : 25°C</p>
-            </div>
-          </div>
-          <div style={{ fontSize: "20px", textAlign: "left", lineHeight: "40px"}}>
-            <DatePicker
-                selected={selectedDate}
-                onChange={(date) => handleDateChange(date)}
-                isClearable
-                showYearDropdown
-                showMonthDropdown
-                dateFormat="dd/MM/yyyy"
-              />
-            <p>Humidité : 25%</p>
-            <p>Vent : Calme</p>
-            <p>Pression : 1013 hPa</p>
-          </div>
-        </Box>
-
-
-        <Box
-          bg={"#e0e0e0"}         
+          bg={"#e0e0e0"}
           boxShadow={"-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"}
           borderRadius={20}
           p={4}
@@ -223,24 +212,16 @@ function HomePage() {
           flexDirection="column"
           justifyContent="space-evenly"
         >
-            <DatePicker
-                selected={selectedDate}
-                onChange={(date) => handleDateChange(date)}
-                isClearable
-                showYearDropdown
-                showMonthDropdown
-                dateFormat="dd/MM/yyyy"
-              />
-            <div style={{ marginLeft: "10px" }}>
-              <p style={{ fontSize: "20px"}}>Lille</p>
-              <p style={{ fontSize: "35px", fontWeight: "bold" }}>20°C</p>
-              <p>min : 12°C</p>
-              <p>max : 25°C</p>
-            </div>
+
+          <div style={{ marginLeft: "10px" }}>
+            <p style={{ fontSize: "20px" }}>VILLE</p>
+            <p style={{ fontSize: "35px", fontWeight: "bold" }}>{weatherData == null ? "chargement" : JSON.stringify(weatherData.hourly.temperature_2m[weatherData.hourly.time.indexOf(date) + 1])}°C</p>
+          </div>
         </Box>
 
+
         <Box
-          bg={"#e0e0e0"}         
+          bg={"#e0e0e0"}
           boxShadow={"-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"}
           borderRadius={20}
           p={4}
@@ -252,34 +233,45 @@ function HomePage() {
           flexDirection="column"
           justifyContent="space-evenly"
         >
-            <DatePicker
-                selected={selectedDate}
-                onChange={(date) => handleDateChange(date)}
-                isClearable
-                showYearDropdown
-                showMonthDropdown
-                dateFormat="dd/MM/yyyy"
-              />
-            <div style={{ marginLeft: "10px" }}>
-              <p style={{ fontSize: "20px"}}>Lille</p>
-              <p style={{ fontSize: "35px", fontWeight: "bold" }}>20°C</p>
-              <p>min : 12°C</p>
-              <p>max : 25°C</p>
-            </div>
-        </Box>
 
-        
+          <div style={{ marginLeft: "10px" }}>
+            <h1>Créer un Widget</h1>
+            <form onSubmit={handleSubmit}>
+              <div>
+                <label htmlFor="taille">Taille :</label>
+                <select
+                  name="taille"
+                  id="taille"
+                  value={taille}
+                  onChange={(e) => setTaille(e.target.value)}
+                >
+                  <option value="SMALL">Petit</option>
+                  <option value="MEDIUM">Grand</option>
+                </select>
+              </div>
+
+              <div>
+                <label htmlFor="ville">Ville :</label>
+                <input
+                  type="text"
+                  name="ville"
+                  id="ville"
+                  placeholder="Nom de la ville"
+                  value={ville}
+                  onChange={(e) => setVille(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <button type="submit">Créer Widget</button>
+              </div>
+            </form>
+          </div>
+        </Box>
 
       </Flex>
-      
-
-      
 
     </div>
-    
-
-    
-
 
   );
 }

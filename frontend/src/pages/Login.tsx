@@ -58,7 +58,7 @@ export default function Login() {
           duration: 3000,
           isClosable: true,
         });
-        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("token", response.data.access_token);
         console.log("token :", response.data.access_token);
         navigate("/accueil");
       })

@@ -98,7 +98,6 @@ export default function Signup() {
           isClosable: true,
         });
       });
-
       })
       .catch((error) => {
         console.error(

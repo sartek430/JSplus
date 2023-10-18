@@ -9,3 +9,11 @@ authentication:
     phrase: config/jwt/public.pem
     algorithm: HS256,
     expiresIn: 365d
+
+db:
+  mysql:
+    host: ${DATABASE_HOST}
+    port: ${DATABASE_PORT}
+    user: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
+    database: ${DATABASE_NAME}

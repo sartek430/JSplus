@@ -7,6 +7,8 @@ import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { WidgetsModule } from './widgets/widgets.module';
+import { ContactsModule } from './contacts/contacts.module';
+import { InvitsModule } from './invits/invits.module';
 
 @Module({
   imports: [
@@ -15,14 +17,20 @@ import { WidgetsModule } from './widgets/widgets.module';
       load: [configuration],
     }),
     TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: 'db.sqlite',
+      type: 'mysql',
+      host: process.env.DB_HOST,
+      port: +process.env.DB_PORT,
+      username: process.env.DB_USER,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_NAME,    
       entities: ['dist/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
     AuthModule,
     UsersModule,
-    WidgetsModule
+    WidgetsModule,
+    ContactsModule,
+    InvitsModule
   ],
   controllers: [AppController],
   providers: [AppService],

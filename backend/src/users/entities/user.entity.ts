@@ -1,5 +1,5 @@
 import { Widget } from "src/widgets/entities/widget.entity";
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity("users")
 export class User {
@@ -17,4 +17,5 @@ export class User {
 
   @OneToMany(() => Widget, (widget) => widget.user)
   widgets: Widget[];
+
 }

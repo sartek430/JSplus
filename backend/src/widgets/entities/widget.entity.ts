@@ -6,6 +6,9 @@ import { EWidgetSize } from "../models";
 export class Widget {
   @PrimaryGeneratedColumn()
   id: number;
+  
+  @Column({ length: 50, nullable: true })
+  displayName: string;
 
   @Column({ type: "float" })
   latitude: number;

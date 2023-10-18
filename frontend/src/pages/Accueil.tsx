@@ -22,7 +22,17 @@ import "react-datepicker/dist/react-datepicker.css";
 import image from "../assets/image/Beautiful Weather.jpg";
 
 function HomePage() {
+  const [widgets, setWidgets] = useState<any[]>([]);
+  const [loadingWidgets, setLoadingWidgets] = useState(true);
+  const [loadingCreateWidgets, setLoadingCreateWidgets] = useState(false);
+  const [weatherData, setWeatherData] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+
+  const [taille, setTaille] = useState('SMALL');
+  const [ville, setVille] = useState('');
+
+  const toast = useToast()
 
   const openModal = () => {
     setIsModalOpen(true);
@@ -32,8 +42,6 @@ function HomePage() {
     setIsModalOpen(false);
   };
 
-  const [selectedDate, setSelectedDate] = useState(new Date());
-
   const handleDateChange = (date: Date | null) => {
     if (!date) return;
     setSelectedDate(date);
@@ -42,14 +50,6 @@ function HomePage() {
   const currentDate = new Date();
   const maxDate = new Date(currentDate);
   maxDate.setDate(currentDate.getDate() + 6);
-  const year = selectedDate.getFullYear();
-  const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0"); // Mois commence à 0, donc ajoutez 1
-  const day = selectedDate.getDate().toString().padStart(2, "0");
-  const hours = selectedDate.getHours().toString().padStart(2, "0");
-  const date = `${year}-${month}-${day}T${hours}:00`;
-  const [widgets, setWidgets] = useState([]);
-  const [loadingWeather, setLoadingWeather] = useState(true);
-  const [weatherData, setWeatherData] = useState<any>(null);
   const [email, setEmail] = useState("");
   const toast = useToast();
 
@@ -96,75 +96,108 @@ function HomePage() {
 };
 
   const getWigets = async () => {
+    const token = localStorage.getItem('token')
     const response = await fetch("https://meteoplus.fly.dev/widgets", {
       method: "GET",
       headers: {
-        Authorization:
-          "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJqdWxlc3NvcmVuc0BnbWFpbC5jb20iLCJuYW1lIjoiSnVsZXMiLCJpYXQiOjE2OTc2MjExNTMsImV4cCI6MTcyOTE1NzE1M30.N-PAEuikOLqyhV7JZWsWMzcos4fz3M3Bs-LlO_lgD-fkhcMfPfholzDZX0RPBM8a-sYCI5IjY8mh_KGKulrgxP45lWwYDdVFP8Se_-Mw7M6MEmzbFpndUdl7FEnR4lKDBJE8-Vs09fEeYXWHvdtXx9dQzxWQzDt3VVBhL67DKyARRFFl97WNwS75rL7RceKSacvs3GV-Xzm2oXpurCWqJSgPZ22Lc7v_SRsHXr49CRuB2aD9k7hs4X5IH-ddYFHN96csAiEELKGrFQa06tJD5nR-p_CJizKrrWC32BzI25ptYrskARZlaUiFlt3uFQ5ZfteHUe_S87n-apfASi1cbw",
+        "Authorization": `Bearer ${token}`,
         "ngrok-skip-browser-warning": "*",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
-    console.log(await response.json());
-  };
-
-  const getWeather = async () => {
-    const response = await fetch(
-      "https://api.open-meteo.com/v1/forecast?latitude=50.6495&longitude=3.113&hourly=temperature_2m,relativehumidity_2m,precipitation,windspeed_10m&timezone=Europe%2FLondon",
-      {
-        method: "GET",
+        'Access-Control-Allow-Origin': '*'
       }
-    );
+    })
+
+    const widgets: any[] = await response.json()
+
+    setWidgets(widgets)
+
+    setLoadingWidgets(false)
+
+    setWidgets(await Promise.all(widgets.map(async (widget: { id: number, displayName: string, latitude: string, longitude: string }) => {
+      const weather = await getWeather(widget.latitude, widget.longitude)
+
+      const year = selectedDate.getFullYear()
+      const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0')
+      const day = selectedDate.getDate().toString().padStart(2, '0')
+      const hours = selectedDate.getHours().toString().padStart(2, '0')
+
+      const date = `${year}-${month}-${day}T${hours}:00`
+
+      return {
+        ...widget,
+        temperature: weather.hourly.temperature_2m[weather.hourly.time.indexOf(date) + 1],
+        humidity: weather.hourly.relativehumidity_2m[weather.hourly.time.indexOf(date) + 1],
+        wind: weather.hourly.windspeed_10m[weather.hourly.time.indexOf(date) + 1]
+      }
+    })));
+  }
+
+  const getWeather = async (lat: string, long: string) => {
+    const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=temperature_2m,relativehumidity_2m,precipitation,windspeed_10m&timezone=Europe%2FLondon`, {
+      method: "GET",
+    })
+
+    return await response.json()
+  }
 
     setWeatherData(await response.json());
   };
 
-  const getcity = async () => {
-    const response = await fetch(
-      `https://geocoding-api.open-meteo.com/v1/search?name=${ville}&count=1&language=fr&format=json`,
-      {
-        method: "GET",
-      }
-    );
+  const getCity = async () => {
+    try {
+      const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${ville}&count=1&language=fr&format=json`)
+      const data = await response.json()
 
-    setCityData(await response.json());
-    console.log(JSON.stringify(cityData.latitude));
-  };
-
-  const [taille, setTaille] = useState("petit");
-  const [ville, setVille] = useState("");
-  const [cityData, setCityData] = useState<any>(null);
-  const [latitude, setLatitude] = useState();
-  const [longitude, setLongitude] = useState();
-
-  const handleSubmit = (e: any) => {
-    e.preventDefault();
-
-    if (ville && /^[A-Z][a-z]*$/.test(ville)) {
-      // Effectuez ici ce que vous souhaitez avec les données valides, par exemple, envoyez-les au serveur.
-      console.log(`Taille : ${taille}, Ville : ${ville}`);
-      getcity();
-      const response = fetch("https://meteoplus.fly.dev/widgets", {
-        method: "POST",
-        headers: {
-          Authorization:
-            "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwiZW1haWwiOiJqdWxlc3NvcmVuc0BnbWFpbC5jb20iLCJuYW1lIjoiSnVsZXMiLCJpYXQiOjE2OTc2MjExNTMsImV4cCI6MTcyOTE1NzE1M30.N-PAEuikOLqyhV7JZWsWMzcos4fz3M3Bs-LlO_lgD-fkhcMfPfholzDZX0RPBM8a-sYCI5IjY8mh_KGKulrgxP45lWwYDdVFP8Se_-Mw7M6MEmzbFpndUdl7FEnR4lKDBJE8-Vs09fEeYXWHvdtXx9dQzxWQzDt3VVBhL67DKyARRFFl97WNwS75rL7RceKSacvs3GV-Xzm2oXpurCWqJSgPZ22Lc7v_SRsHXr49CRuB2aD9k7hs4X5IH-ddYFHN96csAiEELKGrFQa06tJD5nR-p_CJizKrrWC32BzI25ptYrskARZlaUiFlt3uFQ5ZfteHUe_S87n-apfASi1cbw",
-          "ngrok-skip-browser-warning": "*",
-          "Access-Control-Allow-Origin": "*",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ latitude: 50, longitude: 10, size: taille }),
-      });
-    } else {
-      console.error("Les données du formulaire sont incorrectes.");
+      return data.results?.[0]
+    } catch (e) {
+      console.error(e);
+      return null
     }
+  }
+
+  const createWidget = async (e: any) => {
+    e.preventDefault();
+    setLoadingCreateWidgets(true);
+
+    const city = await getCity()
+
+    if (!city) {
+      setLoadingCreateWidgets(false);
+
+      return toast({
+        title: 'La ville n\'a pas été trouvé',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      })
+    }
+
+    const token = localStorage.getItem('token')
+
+    await fetch("https://meteoplus.fly.dev/widgets", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "*",
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        latitude: city.latitude,
+        longitude: city.longitude,
+        size: taille,
+        displayName: `${city.name}${!!city.country ? ` (${city.country})` : ''}`,
+      })
+    })
+
+    await getWigets()
+
+    setLoadingCreateWidgets(false);
   };
 
   useEffect(() => {
-    getWigets();
-    getWeather();
-    console.log(selectedDate);
-  }, []);
+    getWigets()
+  }, [selectedDate]);
+
 
   return (
     <div>
@@ -244,90 +277,49 @@ function HomePage() {
         </ModalContent>
       </Modal>
 
-      <Flex display="flex" justify="space-evenly" flexWrap="wrap">
-        <Box
-          bg="#e0e0e010"
-          backdropFilter={"blur(30px)"}
-          borderRadius={20}
-          p={4}
-          width="40%"
-          h="200px"
-          margin="50px"
-          flexDirection="row"
-          justifyContent="space-evenly"
-          display="flex"
-          alignItems="center"
-        >
-          <div style={{ display: "flex", flexDirection: "row" }}>
-            <div style={{ marginLeft: "10px" }}>
-              <p style={{ fontSize: "20px" }}>VILLE</p>
-              <p style={{ fontSize: "35px", fontWeight: "bold" }}>
-                {weatherData == null
-                  ? "chargement"
-                  : JSON.stringify(
-                      weatherData.hourly.temperature_2m[
-                        weatherData.hourly.time.indexOf(date) + 1
-                      ]
-                    )}
-                °C
-              </p>
-            </div>
-          </div>
-          <div
-            style={{ fontSize: "20px", textAlign: "left", lineHeight: "40px" }}
-          >
-            <p>
-              Humidité :{" "}
-              {weatherData == null
-                ? "chargement"
-                : JSON.stringify(
-                    weatherData.hourly.relativehumidity_2m[
-                      weatherData.hourly.time.indexOf(date) + 1
-                    ]
-                  )}
-              %
-            </p>
-            <p>
-              Vent :{" "}
-              {weatherData == null
-                ? "chargement"
-                : JSON.stringify(
-                    weatherData.hourly.windspeed_10m[
-                      weatherData.hourly.time.indexOf(date) + 1
-                    ]
-                  )}
-              Km/h
-            </p>
-          </div>
-        </Box>
+      <Flex
+        display="flex"
+        justify="space-evenly"
+        flexWrap="wrap"
+      >
 
-        <Box
-          bg={"#e0e0e010"}
-          backdropFilter={"blur(30px)"}
-          borderRadius={20}
-          p={4}
-          width="15%"
-          h="200px"
-          textAlign="center"
-          display="flex"
-          margin="50px"
-          flexDirection="column"
-          justifyContent="space-evenly"
-        >
-          <div style={{ marginLeft: "10px" }}>
-            <p style={{ fontSize: "20px" }}>VILLE</p>
-            <p style={{ fontSize: "35px", fontWeight: "bold" }}>
-              {weatherData == null
-                ? "chargement"
-                : JSON.stringify(
-                    weatherData.hourly.temperature_2m[
-                      weatherData.hourly.time.indexOf(date) + 1
-                    ]
-                  )}
-              °C
-            </p>
-          </div>
-        </Box>
+        {loadingWidgets ? (
+          <Spinner
+            thickness='4px'
+            speed='0.65s'
+            emptyColor='gray.200'
+            color='blue.500'
+            size='xl'
+          />
+        ) : widgets.length > 0 ? widgets.map((widget: any) => (
+          <Box
+            bg="#e0e0e010"
+            backdropFilter={"blur(30px)"}
+            boxShadow="-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"
+            borderRadius={20}
+            p={4}
+            width={widget.size === "SMALL" ? "15%" : "40%"}
+            h="200px"
+            margin="50px"
+            flexDirection="row"
+            justifyContent="space-evenly"
+            display="flex"
+            alignItems="center"
+          >
+            <div style={{ display: "flex", flexDirection: "row" }}>
+              <div style={{ marginLeft: "10px" }}>
+                <p style={{ fontSize: "20px" }}>{widget.displayName}</p>
+                <p style={{ fontSize: "35px", fontWeight: "bold" }}>{!widget.temperature ? <Spinner /> : widget.temperature}°C</p>
+              </div>
+            </div>
+            {widget.size !== "SMALL" && (
+              <div style={{ fontSize: "20px", textAlign: "left", lineHeight: "40px" }}>
+                <p>Humidité : {!widget.humidity ? <Spinner /> : widget.humidity}%</p>
+                <p>Vent : {!widget.wind ? <Spinner /> : widget.wind}km/h</p>
+              </div>
+            )}
+          </Box>
+        )) : <p>Vous n'avez pas encore de widgets.</p>}
 
         <Box
           bg={"#e0e0e010"}
@@ -344,36 +336,40 @@ function HomePage() {
         >
           <div style={{ marginLeft: "10px" }}>
             <h1>Créer un Widget</h1>
-            <form onSubmit={handleSubmit}>
-              <div>
-                <label htmlFor="taille">Taille :</label>
-                <select
-                  name="taille"
-                  id="taille"
-                  value={taille}
-                  onChange={(e) => setTaille(e.target.value)}
-                >
-                  <option value="SMALL">Petit</option>
-                  <option value="MEDIUM">Grand</option>
-                </select>
-              </div>
+            {loadingCreateWidgets ? (
+              <Spinner />
+            ) : (
+              <form onSubmit={createWidget}>
+                <div>
+                  <label htmlFor="taille">Taille :</label>
+                  <select
+                    name="taille"
+                    id="taille"
+                    value={taille}
+                    onChange={(e) => setTaille(e.target.value)}
+                  >
+                    <option value="SMALL">Petit</option>
+                    <option value="MEDIUM">Grand</option>
+                  </select>
+                </div>
 
-              <div>
-                <label htmlFor="ville">Ville :</label>
-                <input
-                  type="text"
-                  name="ville"
-                  id="ville"
-                  placeholder="Nom de la ville"
-                  value={ville}
-                  onChange={(e) => setVille(e.target.value)}
-                />
-              </div>
+                <div>
+                  <label htmlFor="ville">Ville :</label>
+                  <input
+                    type="text"
+                    name="ville"
+                    id="ville"
+                    placeholder="Nom de la ville"
+                    value={ville}
+                    onChange={(e) => setVille(e.target.value)}
+                  />
+                </div>
 
-              <div>
-                <button type="submit">Créer Widget</button>
-              </div>
-            </form>
+                <div>
+                  <button type="submit">Créer Widget</button>
+                </div>
+              </form>
+            )}
           </div>
         </Box>
       </Flex>

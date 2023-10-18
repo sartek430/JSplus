@@ -1,11 +1,9 @@
 import {
-  Avatar,
   Box,
   Button,
   Flex,
   Image,
   Input,
-  Link,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -14,17 +12,18 @@ import {
   ModalOverlay,
   Spinner,
   Text,
-  useToast
+  useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import DatePicker from "react-datepicker";
+
 import "react-datepicker/dist/react-datepicker.css";
 import image from "../assets/image/Beautiful Weather.jpg";
 import cloudy from "../assets/image/icons/cloudy.png";
 import rain from "../assets/image/icons/rain.png";
 import storm from "../assets/image/icons/storm.png";
 import sunny from "../assets/image/icons/sun.png";
+import Navbar from "../components/Navbar";
 
 function HomePage() {
   const [widgets, setWidgets] = useState<any[]>([]);
@@ -33,12 +32,12 @@ function HomePage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  const [taille, setTaille] = useState('SMALL');
-  const [ville, setVille] = useState('');
+  const [taille, setTaille] = useState("SMALL");
+  const [ville, setVille] = useState("");
 
-  const toast = useToast()
+  const toast = useToast();
 
-  const openModal = () => {
+  const openModal = (): void => {
     setIsModalOpen(true);
   };
 
@@ -46,14 +45,6 @@ function HomePage() {
     setIsModalOpen(false);
   };
 
-  const handleDateChange = (date: Date | null) => {
-    if (!date) return;
-    setSelectedDate(date);
-  };
-
-  const currentDate = new Date();
-  const maxDate = new Date(currentDate);
-  maxDate.setDate(currentDate.getDate() + 6);
   const [email, setEmail] = useState("");
 
   const sendInvit = async () => {
@@ -68,14 +59,18 @@ function HomePage() {
       return;
     }
 
-    axios.post("https://meteoplus.fly.dev/invits", {
-      email: email,
-    },
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+    axios
+      .post(
+        "https://meteoplus.fly.dev/invits",
+        {
+          email: email,
         },
-      })
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        }
+      )
       .then((response) => {
         console.log(response);
         closeModal();
@@ -99,155 +94,154 @@ function HomePage() {
   };
 
   const getWigets = async () => {
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem("token");
     const response = await fetch("https://meteoplus.fly.dev/widgets", {
       method: "GET",
       headers: {
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         "ngrok-skip-browser-warning": "*",
-        'Access-Control-Allow-Origin': '*'
-      }
-    })
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
 
-    const widgets: any[] = await response.json()
+    const widgets: any[] = await response.json();
 
-    setWidgets(widgets)
+    setWidgets(widgets);
 
-    setLoadingWidgets(false)
+    setLoadingWidgets(false);
 
-    setWidgets(await Promise.all(widgets.map(async (widget: { id: number, displayName: string, latitude: string, longitude: string }) => {
-      const weather = await getWeather(widget.latitude, widget.longitude)
+    setWidgets(
+      await Promise.all(
+        widgets.map(
+          async (widget: {
+            id: number;
+            displayName: string;
+            latitude: string;
+            longitude: string;
+          }) => {
+            const weather = await getWeather(widget.latitude, widget.longitude);
 
-      const year = selectedDate.getFullYear()
-      const month = (selectedDate.getMonth() + 1).toString().padStart(2, '0')
-      const day = selectedDate.getDate().toString().padStart(2, '0')
-      const hours = selectedDate.getHours().toString().padStart(2, '0')
+            const year = selectedDate.getFullYear();
+            const month = (selectedDate.getMonth() + 1)
+              .toString()
+              .padStart(2, "0");
+            const day = selectedDate.getDate().toString().padStart(2, "0");
+            const hours = selectedDate.getHours().toString().padStart(2, "0");
 
-      const date = `${year}-${month}-${day}T${hours}:00`
+            const date = `${year}-${month}-${day}T${hours}:00`;
 
-      const i = weather.hourly.time.indexOf(date) + 1
+            const i = weather.hourly.time.indexOf(date) + 1;
 
-      return {
-        ...widget,
-        temperature: weather.hourly.temperature_2m[i],
-        humidity: weather.hourly.relativehumidity_2m[i],
-        wind: weather.hourly.windspeed_10m[i],
-        isSunny: weather.hourly.weathercode[i] >= 0 && weather.hourly.weathercode[i] <= 3,
-        isCloudy: weather.hourly.weathercode[i] >= 4 && weather.hourly.weathercode[i] <= 60,
-        isRainy: weather.hourly.weathercode[i] >= 61 && weather.hourly.weathercode[i] <= 86,
-        isStormy: weather.hourly.weathercode[i] >= 87 && weather.hourly.weathercode[i] <= 99,
-      }
-    })));
-  }
+            return {
+              ...widget,
+              temperature: weather.hourly.temperature_2m[i],
+              humidity: weather.hourly.relativehumidity_2m[i],
+              wind: weather.hourly.windspeed_10m[i],
+              isSunny:
+                weather.hourly.weathercode[i] >= 0 &&
+                weather.hourly.weathercode[i] <= 3,
+              isCloudy:
+                weather.hourly.weathercode[i] >= 4 &&
+                weather.hourly.weathercode[i] <= 60,
+              isRainy:
+                weather.hourly.weathercode[i] >= 61 &&
+                weather.hourly.weathercode[i] <= 86,
+              isStormy:
+                weather.hourly.weathercode[i] >= 87 &&
+                weather.hourly.weathercode[i] <= 99,
+            };
+          }
+        )
+      )
+    );
+  };
 
   const getWeather = async (lat: string, long: string) => {
-    const response = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=temperature_2m,relativehumidity_2m,weathercode,windspeed_10m&timezone=Europe%2FLondon`, {
-      method: "GET",
-    })
+    const response = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=temperature_2m,relativehumidity_2m,weathercode,windspeed_10m&timezone=Europe%2FLondon`,
+      {
+        method: "GET",
+      }
+    );
 
-    return await response.json()
-  }
+    return await response.json();
+  };
 
   const getCity = async () => {
     try {
-      const response = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${ville}&count=1&language=fr&format=json`)
-      const data = await response.json()
+      const response = await fetch(
+        `https://geocoding-api.open-meteo.com/v1/search?name=${ville}&count=1&language=fr&format=json`
+      );
+      const data = await response.json();
 
-      return data.results?.[0]
+      return data.results?.[0];
     } catch (e) {
       console.error(e);
-      return null
+      return null;
     }
-  }
+  };
 
   const createWidget = async (e: any) => {
     e.preventDefault();
     setLoadingCreateWidgets(true);
 
-    const city = await getCity()
+    const city = await getCity();
 
     if (!city) {
       setLoadingCreateWidgets(false);
 
       return toast({
-        title: 'La ville n\'a pas été trouvé',
-        status: 'error',
+        title: "La ville n'a pas été trouvé",
+        status: "error",
         duration: 3000,
         isClosable: true,
-      })
+      });
     }
 
-    const token = localStorage.getItem('token')
+    const token = localStorage.getItem("token");
 
     await fetch("https://meteoplus.fly.dev/widgets", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
         "ngrok-skip-browser-warning": "*",
-        'Access-Control-Allow-Origin': '*',
-        'Content-Type': 'application/json'
+        "Access-Control-Allow-Origin": "*",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         latitude: city.latitude,
         longitude: city.longitude,
         size: taille,
-        displayName: `${city.name}${!!city.country ? ` (${city.country})` : ''}`,
-      })
-    })
+        displayName: `${city.name}${
+          !!city.country ? ` (${city.country})` : ""
+        }`,
+      }),
+    });
 
-    await getWigets()
+    await getWigets();
 
     setLoadingCreateWidgets(false);
   };
 
   useEffect(() => {
-    getWigets()
+    getWigets();
   }, [selectedDate]);
 
+  const handleDateChange = (date: Date) => {
+    setSelectedDate(date);
+  };
 
   return (
-    <div>
-      <Image src={image} position={"absolute"} zIndex={-10} h={"100vh"} w={"100%"}></Image>
-      <Flex
-        as="nav"
-        align="center"
-        justify="space-between"
-        padding="1rem"
-        backgroundColor="#e0e0e050"
-        backdropBlur={"blur(30px)"}
-      >
-        <Flex justify="space-between" width="15%">
-          <Link href="/about" color="white" textDecoration="none">
-            Tableau de bord
-          </Link>
-          <Link href="/contact" color="white" textDecoration="none">
-            Autre
-          </Link>
-        </Flex>
-        <Flex>
-          <DatePicker
-            selected={selectedDate}
-            onChange={(date) => handleDateChange(date)}
-            isClearable
-            minDate={currentDate}
-            maxDate={maxDate}
-            showYearDropdown
-            showMonthDropdown
-            showTimeSelect
-            dateFormat="dd/MM/yyyy-HH'h'"
-          />
-        </Flex>
-        <Flex justify="space-between">
-          <Link onClick={openModal} color="white" textDecoration="none">
-            <Text mr={10} fontSize={20}>
-              Inviter
-            </Text>
-          </Link>
-          <Link href="/profile" color="white" textDecoration="none">
-            <Avatar bg="#CBD5E0" boxSize={7} />
-          </Link>
-        </Flex>
-      </Flex>
+    <Box>
+      <Image
+        src={image}
+        position={"absolute"}
+        zIndex={-10}
+        h={"100vh"}
+        w={"100%"}
+      ></Image>
+
+      <Navbar openModal={openModal} onDateChange={handleDateChange} />
 
       <Modal isOpen={isModalOpen} onClose={closeModal}>
         <ModalOverlay />
@@ -283,51 +277,77 @@ function HomePage() {
         </ModalContent>
       </Modal>
 
-      <Flex
-        display="flex"
-        justify="space-evenly"
-        flexWrap="wrap"
-      >
-
+      <Flex display="flex" justify="space-evenly" flexWrap="wrap">
         {loadingWidgets ? (
           <Spinner
-            thickness='4px'
-            speed='0.65s'
-            emptyColor='gray.200'
-            color='blue.500'
-            size='xl'
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="blue.500"
+            size="xl"
           />
-        ) : widgets.length > 0 ? widgets.map((widget: any) => (
-          <Box
-            bg="#e0e0e010"
-            backdropFilter={"blur(30px)"}
-            borderRadius={20}
-            p={4}
-            width={widget.size === "SMALL" ? "15%" : "40%"}
-            h="200px"
-            margin="50px"
-            flexDirection="row"
-            justifyContent="space-evenly"
-            display="flex"
-            alignItems="center"
-          >
-            <div style={{ display: "flex", flexDirection: "row" }}>
-              <div style={{ marginLeft: "10px" }}>
-                <p style={{ fontSize: "20px" }}>{widget.displayName}</p>
-                <Flex flexDirection="row" alignItems={"center"}>
-                  <Image src={widget.isSunny ? sunny : widget.isCloudy ? cloudy : widget.isRainy ? rain : storm} alt="weather" width={widget.size === "SMALL" ? "50px" : "100px"} style={{ marginRight: "10px" }} />
-                  <p style={{ fontSize: "35px", fontWeight: "bold" }}>{!widget.temperature ? <Spinner /> : widget.temperature}°C</p>
-                </Flex>
-              </div>
-            </div>
-            {widget.size !== "SMALL" && (
-              <div style={{ fontSize: "20px", textAlign: "left", lineHeight: "40px" }}>
-                <p>Humidité : {!widget.humidity ? <Spinner /> : widget.humidity}%</p>
-                <p>Vent : {!widget.wind ? <Spinner /> : widget.wind}km/h</p>
-              </div>
-            )}
-          </Box>
-        )) : <p>Vous n'avez pas encore de widgets.</p>}
+        ) : widgets.length > 0 ? (
+          widgets.map((widget: any, index: number) => (
+            <Box
+              key={index}
+              bg="#e0e0e010"
+              backdropFilter={"blur(30px)"}
+              borderRadius={20}
+              p={4}
+              width={widget.size === "SMALL" ? "15%" : "40%"}
+              h="200px"
+              margin="50px"
+              flexDirection="row"
+              justifyContent="space-evenly"
+              display="flex"
+              alignItems="center"
+            >
+              <Box style={{ display: "flex", flexDirection: "row" }}>
+                <Box style={{ marginLeft: "10px" }}>
+                  <Text style={{ fontSize: "20px" }}>{widget.displayName}</Text>
+                  <Flex flexDirection="row" alignItems={"center"}>
+                    <Image
+                      src={
+                        widget.isSunny
+                          ? sunny
+                          : widget.isCloudy
+                          ? cloudy
+                          : widget.isRainy
+                          ? rain
+                          : storm
+                      }
+                      alt="weather"
+                      width={widget.size === "SMALL" ? "50px" : "100px"}
+                      style={{ marginRight: "10px" }}
+                    />
+                    <Text style={{ fontSize: "35px", fontWeight: "bold" }}>
+                      {!widget.temperature ? <Spinner /> : widget.temperature}°C
+                    </Text>
+                  </Flex>
+                </Box>
+              </Box>
+              {widget.size !== "SMALL" && (
+                <Box
+                  style={{
+                    fontSize: "20px",
+                    textAlign: "left",
+                    lineHeight: "40px",
+                  }}
+                >
+                  <Text>
+                    Humidité :{" "}
+                    {!widget.humidity ? <Spinner /> : widget.humidity}%
+                  </Text>
+                  <Text>
+                    Vent : {!widget.wind ? <Spinner /> : widget.wind}km/h
+                  </Text>
+                </Box>
+              )}
+            </Box>
+          ))
+        ) : (
+          <Text>Vous n'avez pas encore de widgets.</Text>
+        )}
 
         <Box
           bg={"#e0e0e010"}
@@ -342,13 +362,13 @@ function HomePage() {
           flexDirection="column"
           justifyContent="space-evenly"
         >
-          <div style={{ marginLeft: "10px" }}>
-            <h1>Créer un Widget</h1>
+          <Box style={{ marginLeft: "10px" }}>
+            <Text>Créer un Widget</Text>
             {loadingCreateWidgets ? (
               <Spinner />
             ) : (
               <form onSubmit={createWidget}>
-                <div>
+                <Box>
                   <label htmlFor="taille">Taille :</label>
                   <select
                     name="taille"
@@ -359,9 +379,9 @@ function HomePage() {
                     <option value="SMALL">Petit</option>
                     <option value="MEDIUM">Grand</option>
                   </select>
-                </div>
+                </Box>
 
-                <div>
+                <Box>
                   <label htmlFor="ville">Ville :</label>
                   <input
                     type="text"
@@ -371,17 +391,17 @@ function HomePage() {
                     value={ville}
                     onChange={(e) => setVille(e.target.value)}
                   />
-                </div>
+                </Box>
 
-                <div>
+                <Box>
                   <button type="submit">Créer Widget</button>
-                </div>
+                </Box>
               </form>
             )}
-          </div>
+          </Box>
         </Box>
       </Flex>
-    </div>
+    </Box>
   );
 }
 

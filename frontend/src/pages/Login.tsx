@@ -23,6 +23,12 @@ export default function Login() {
   const navigate = useNavigate();
   const toast = useToast();
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      connection();
+    }
+  };
+
   const connection = (): void => {
     if (email === "" || password === "") {
       toast({
@@ -115,6 +121,7 @@ export default function Login() {
           color={"#2583DA"}
           _hover={{ borderColor: "#0E487D" }}
           onChange={(e) => setEmail(e.target.value)}
+          onKeyDown={handleKeyPress}
         />
 
         <InputGroup alignItems="center" justifyContent={"center"}>
@@ -131,6 +138,7 @@ export default function Login() {
             type={showPassword ? "text" : "password"}
             placeholder="Mot de passe"
             onChange={(e) => setPassword(e.target.value)}
+            onKeyDown={handleKeyPress}
           />
           {/* affiche un bouton qui affiche ou non le mot de passe */}
           <InputRightElement width="auto" m="5px">
@@ -169,7 +177,7 @@ export default function Login() {
             bgGradient: "linear(to-r, #2583DA, #0E487D)",
             transform: "scale(1.05)",
           }}
-          _active={{ transform: "scale(1)" }}
+          _active={{ transform: "scale(0.9)" }}
           boxShadow={"-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"}
           onClick={connection}
         >

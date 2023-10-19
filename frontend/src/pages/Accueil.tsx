@@ -3,18 +3,10 @@ import {
   Button,
   Flex,
   Image,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalHeader,
-  ModalOverlay,
   Spinner,
   Text,
   useToast,
 } from "@chakra-ui/react";
-import axios from "axios";
 import { useCallback, useEffect, useState } from "react";
 
 import "react-datepicker/dist/react-datepicker.css";
@@ -29,69 +21,13 @@ function HomePage() {
   const [widgets, setWidgets] = useState<any[]>([]);
   const [loadingWidgets, setLoadingWidgets] = useState(true);
   const [loadingCreateWidgets, setLoadingCreateWidgets] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   const [taille, setTaille] = useState("SMALL");
   const [ville, setVille] = useState("");
 
   const toast = useToast();
-
-  const openModal = (): void => {
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const [email, setEmail] = useState("");
-
-  const sendInvit = async () => {
-    if (email === "") {
-      toast({
-        title: "Erreur lors de l'envoi de l'invitation",
-        description: "L'adresse mail est vide",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
-    axios
-      .post(
-        "https://meteoplus.fly.dev/invits",
-        {
-          email: email,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-        }
-      )
-      .then((response) => {
-        console.log(response);
-        closeModal();
-        toast({
-          title: "Invitation envoyée avec succès",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-      })
-      .catch((error) => {
-        console.error(error);
-        toast({
-          title: "Erreur lors de l'envoi de l'invitation",
-          description: error.response.data.message,
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      });
-  };
 
   const getWigets = useCallback(async () => {
     const token = localStorage.getItem("token");
@@ -110,6 +46,7 @@ function HomePage() {
 
     setLoadingWidgets(false);
 
+    if (widgets.length === 0) return;
     setWidgets(
       await Promise.all(
         widgets.map(
@@ -239,41 +176,7 @@ function HomePage() {
         w={"100%"}
       ></Image>
 
-      <Navbar openModal={openModal} onDateChange={handleDateChange} />
-
-      <Modal isOpen={isModalOpen} onClose={closeModal}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader fontSize={25} fontWeight={"bold"}>
-            Créer une Invitation
-          </ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
-            <Flex flexDirection={"column"} alignItems={"center"}>
-              <Box
-                w={"80%"}
-                h={1}
-                bg={"#0E487D"}
-                mt={"-10px"}
-                mb={"20px"}
-                borderRadius={"full"}
-              />
-              <Text alignSelf={"baseline"} fontSize={20} fontWeight={"bold"}>
-                Insérer addresse mail{" "}
-              </Text>
-              <Input
-                mt={5}
-                mb={5}
-                placeholder="Addresse mail"
-                onChange={(e) => setEmail(e.target.value)}
-              ></Input>
-              <Button alignSelf={"end"} mt={"20px"} onClick={sendInvit}>
-                Inviter
-              </Button>
-            </Flex>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
+      <Navbar onDateChange={handleDateChange} />
 
       <Flex display="flex" justify="space-evenly" flexWrap="wrap">
         {loadingWidgets ? (
@@ -317,9 +220,14 @@ function HomePage() {
                       width={widget.size === "SMALL" ? "50px" : "100px"}
                       style={{ marginRight: "10px" }}
                     />
-                    <Text style={{ fontSize: "35px", fontWeight: "bold" }}>
-                      {!widget.temperature ? <Spinner /> : widget.temperature}°C
-                    </Text>
+
+                    {!widget.temperature ? (
+                      <Spinner />
+                    ) : (
+                      <Text style={{ fontSize: "35px", fontWeight: "bold" }}>
+                        {widget.temperature}°C
+                      </Text>
+                    )}
                   </Flex>
                 </Box>
               </Box>
@@ -331,13 +239,24 @@ function HomePage() {
                     lineHeight: "40px",
                   }}
                 >
-                  <Text>
+                  <Flex>
                     Humidité :{" "}
-                    {!widget.humidity ? <Spinner /> : widget.humidity}%
-                  </Text>
-                  <Text>
-                    Vent : {!widget.wind ? <Spinner /> : widget.wind}km/h
-                  </Text>
+                    {!widget.humidity ? (
+                      <Spinner />
+                    ) : (
+                      <Text ml={2}> {widget.humidity} </Text>
+                    )}
+                    %
+                  </Flex>
+                  <Flex>
+                    Vent :{" "}
+                    {!widget.wind ? (
+                      <Spinner />
+                    ) : (
+                      <Text ml={2}> {widget.wind}</Text>
+                    )}
+                    km/h
+                  </Flex>
                 </Box>
               )}
             </Box>

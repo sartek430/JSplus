@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Flex,
   Text,
@@ -170,6 +171,10 @@ export default function Navbar({ onDateChange }: navbarProps) {
     }
   };
 
+  const acceptInvit = async (id: number) => {};
+
+  const refuseInvit = async (id: number) => {};
+
   return (
     <Flex
       as="nav"
@@ -263,16 +268,43 @@ export default function Navbar({ onDateChange }: navbarProps) {
                   mb={"20px"}
                   borderRadius={"full"}
                 />
+                <Text alignSelf={"baseline"} fontSize={20} fontWeight={"bold"}>
+                  Invitations
+                </Text>
                 {notifications.length > 0 ? (
                   notifications.map((notif) => (
-                    <Text key={notif.id}>
-                      {users.find((user) => user.id === notif.senderId)?.name ??
-                        "inconnu"}{" "}
-                      vous a invité
-                    </Text>
+                    <React.StrictMode>
+                      <Text key={notif.id} mt={5} mb={30} fontWeight={500}>
+                        {users.find((user) => user.id === notif.senderId)
+                          ?.name ?? "inconnu"}{" "}
+                        vous a invité
+                      </Text>
+                      <Flex justifyContent={"space-around"}>
+                        <Button m={4} onClick={() => refuseInvit(notif.id)}>
+                          Refuser
+                        </Button>
+
+                        <Button
+                          m={4}
+                          alignSelf={"end"}
+                          onClick={() => acceptInvit(notif.id)}
+                          color={"#FFFFFF"}
+                          bg={"#0E487D"}
+                          _hover={{
+                            bg: "#0E487D",
+                            transform: "scale(1.05)",
+                          }}
+                          _active={{ transform: "scale(0.9)" }}
+                        >
+                          Accepter
+                        </Button>
+                      </Flex>
+                    </React.StrictMode>
                   ))
                 ) : (
-                  <Text>Aucune notification</Text>
+                  <Text mt={30} mb={30}>
+                    Aucune notification
+                  </Text>
                 )}
               </Flex>
             </ModalBody>

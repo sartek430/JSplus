@@ -30,6 +30,45 @@ export default function Signup() {
     }
   };
 
+  const connection = (): void => {
+    axios
+    .post(
+      "https://meteoplus.fly.dev/login",
+      {
+        email: email,
+        password: password,
+      },
+      {
+        headers: {
+          "Content-Type": "application/json",
+          "Access-Control-Allow-Origin": "*",
+          "ngrok-skip-browser-warning": "*",
+        },
+      }
+    )
+    .then((response) => {
+      console.log("Utilisateur connecté :", response.data);
+      toast({
+        title: "Utilisateur connecté avec succès",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+      localStorage.setItem("token", response.data.token);
+      navigate("/accueil");
+    })
+    .catch((error) => {
+      console.error("Erreur lors de la connection de l'utilisateur :", error);
+      toast({
+        title: "Erreur lors de la connection de l'utilisateur",
+        description: error.response.data.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    });
+  };
+
   const createAcount = (): void => {
     if(email === "" || password === "" || username === ""){
       toast({
@@ -67,43 +106,7 @@ export default function Signup() {
           duration: 3000,
           isClosable: true,
         });
-
-        axios
-      .post(
-        "https://meteoplus.fly.dev/login",
-        {
-          email: email,
-          password: password,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "ngrok-skip-browser-warning": "*",
-          },
-        }
-      )
-      .then((response) => {
-        console.log("Utilisateur connecté :", response.data);
-        toast({
-          title: "Utilisateur connecté avec succès",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        localStorage.setItem("token", response.data.token);
-        navigate("/accueil");
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la connection de l'utilisateur :", error);
-        toast({
-          title: "Erreur lors de la connection de l'utilisateur",
-          description: error.response.data.message,
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
-      });
+        connection();
       })
       .catch((error) => {
         console.error(

@@ -21,10 +21,8 @@ export default function Navbar({ openModal, onDateChange }: navbarProps) {
       as="nav"
       align="center"
       gap={10}
-      padding="2rem"
-      backgroundColor="#e0e0e050"
-      backdropFilter={"blur(10px)"}
-      borderBottom={"2px solid #e0e0e050"}
+      padding="1.5rem"
+      backgroundColor="#FFFFFF"
     >
       <Flex justify="space-between">
         <Text color="#0E487D" fontWeight={"bold"} fontSize={35}>

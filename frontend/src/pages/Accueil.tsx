@@ -290,8 +290,7 @@ function HomePage() {
           widgets.map((widget: any, index: number) => (
             <Box
               key={index}
-              bg="#e0e0e010"
-              backdropFilter={"blur(30px)"}
+              bg={"#FFFFFFA0"}
               borderRadius={20}
               p={4}
               width={widget.size === "SMALL" ? "15%" : "40%"}
@@ -350,8 +349,7 @@ function HomePage() {
         )}
 
         <Box
-          bg={"#e0e0e010"}
-          backdropFilter={"blur(30px)"}
+          bg={"#FFFFFFA0"}
           borderRadius={20}
           p={4}
           width="15%"
@@ -394,7 +392,13 @@ function HomePage() {
                 </Box>
 
                 <Box>
-                  <button type="submit">Créer Widget</button>
+                  <Button 
+                    bg={"none"} 
+                    type="submit"
+                    _hover={{ bg: "none" }}
+                    >
+                    Créer Widget
+                  </Button>
                 </Box>
               </form>
             )}

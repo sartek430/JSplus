@@ -6,7 +6,6 @@ type navbarProps = {
 };
 
 export default function Navbar({ openModal, onDateChange }: navbarProps) {
-
   const currentDate = new Date();
   const maxDate = new Date(currentDate);
   maxDate.setDate(currentDate.getDate() + 6);
@@ -43,9 +42,9 @@ export default function Navbar({ openModal, onDateChange }: navbarProps) {
       </Flex>
       <Flex justify="space-between">
         <Link onClick={openModal} color="white" textDecoration="none">
-          <Button 
-            mr={10} 
-            fontSize={20} 
+          <Button
+            mr={10}
+            fontSize={20}
             bgGradient={"linear(to-r, #2583DA, #0E487D)"}
             _hover={{
               bgGradient: "linear(to-r, #2583DA, #0E487D)",
@@ -53,8 +52,7 @@ export default function Navbar({ openModal, onDateChange }: navbarProps) {
             }}
             _active={{ transform: "scale(0.9)" }}
             color={"#FFFFFF"}
-            
-            >
+          >
             Inviter
           </Button>
         </Link>

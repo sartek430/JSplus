@@ -15,7 +15,7 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import "react-datepicker/dist/react-datepicker.css";
 import image from "../assets/image/Beautiful Weather.jpg";
@@ -93,7 +93,7 @@ function HomePage() {
       });
   };
 
-  const getWigets = async () => {
+  const getWigets = useCallback(async () => {
     const token = localStorage.getItem("token");
     const response = await fetch("https://meteoplus.fly.dev/widgets", {
       method: "GET",
@@ -154,7 +154,7 @@ function HomePage() {
         )
       )
     );
-  };
+  }, [selectedDate]);
 
   const getWeather = async (lat: string, long: string) => {
     const response = await fetch(
@@ -212,9 +212,7 @@ function HomePage() {
         latitude: city.latitude,
         longitude: city.longitude,
         size: taille,
-        displayName: `${city.name}${
-          !!city.country ? ` (${city.country})` : ""
-        }`,
+        displayName: `${city.name}${city.country ? ` (${city.country})` : ""}`,
       }),
     });
 
@@ -225,7 +223,7 @@ function HomePage() {
 
   useEffect(() => {
     getWigets();
-  }, [selectedDate]);
+  }, [selectedDate, getWigets]);
 
   const handleDateChange = (date: Date) => {
     setSelectedDate(date);
@@ -392,11 +390,7 @@ function HomePage() {
                 </Box>
 
                 <Box>
-                  <Button 
-                    bg={"none"} 
-                    type="submit"
-                    _hover={{ bg: "none" }}
-                    >
+                  <Button bg={"none"} type="submit" _hover={{ bg: "none" }}>
                     Créer Widget
                   </Button>
                 </Box>

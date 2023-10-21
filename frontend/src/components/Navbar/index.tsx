@@ -193,15 +193,21 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
    */
   const acceptInvit = async (id: number) => {
     try {
-      const response = await axios.patch(`https://meteoplus.fly.dev/invits/${id}`, {
-        status: "200",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+      const response = await axios.patch(
+        `https://meteoplus.fly.dev/invits/${id}`,
+        {
+          status: 200,
         },
-      });
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
+
       console.log("Invitation acceptée :", response.data);
-      getInvit();
+      getInvit(); // Supposant que c'est une fonction à appeler pour rafraîchir les données
       toast({
         title: "Invitation acceptée",
         status: "success",
@@ -220,15 +226,25 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
     }
   };
 
+  /**
+   * Refuse une invitation spécifiée par son identifiant.
+   *
+   * @param {number} id - Identifiant de l'invitation à refuser.
+   */
   const refuseInvit = async (id: number) => {
     try {
-      const response = await axios.patch(`https://meteoplus.fly.dev/invits/${id}`, {
-        status: "300",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+      const response = await axios.patch(
+        `https://meteoplus.fly.dev/invits/${id}`,
+        {
+          status: 300,
         },
-      });
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        },
+      );
       console.log("Invitation refusée :", response.data);
       getInvit();
       toast({
@@ -312,7 +328,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
           <ModalOverlay />
           <ModalContent>
             <ModalHeader fontSize={25} fontWeight={"bold"}>
-              Invits
+              Notification(s)
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>

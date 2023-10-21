@@ -181,6 +181,8 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
           placeholder="Select Date and Time"
           size="md"
           type="datetime-local"
+          min={currentDate.toISOString().slice(0, 16)}
+          max={maxDate.toISOString().slice(0, 16)}
         />
       </Flex>
 

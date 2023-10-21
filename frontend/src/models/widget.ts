@@ -19,3 +19,4 @@ export interface IWidget extends IWidgetDb {
   humidity: number;
   wind: number;
 }
+

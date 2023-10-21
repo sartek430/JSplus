@@ -26,7 +26,8 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
       navigate("/login");
       localStorage.removeItem("token");
     }
-  }, [navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return <>{children}</>;
 };

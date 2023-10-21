@@ -16,47 +16,79 @@ import {
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { FaRegBell } from "react-icons/fa";
+import { User } from "../../models/user.ts";
+import { Invit } from "../../models/invit.ts";
 
+/**
+ * Propriétés attendues par le composant Navbar.
+ *
+ * @typedef {Object} NavbarProps
+ * @property {Function} onDateChange - Fonction appelée lorsqu'une date est sélectionnée.
+ */
 interface NavbarProps {
   onDateChange: (date: Date) => void;
 }
 
-interface Notification {
-  id: number;
-  senderId: string;
-  receiverId: string;
-  status: string;
-}
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-}
-
+/**
+ * Composant Navbar affichant la barre de navigation.
+ *
+ * @param {NavbarProps} props - Propriétés du composant Navbar.
+ */
 const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
   const currentDate = new Date();
   const maxDate = new Date(currentDate);
   maxDate.setDate(currentDate.getDate() + 6);
   const toast = useToast();
-  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [Invits, setInvits] = useState<Invit[]>([]);
   const { isOpen: isInvitModalOpen, onOpen: onInvitModalOpen, onClose: onInvitModalClose } = useDisclosure();
-
   const { isOpen: isNotifModalOpen, onOpen: onNotifModalOpen, onClose: onNotifModalClose } = useDisclosure();
   const [users, setUsers] = useState<User[]>([]);
+  const [email, setEmail] = useState("");
 
+  useEffect(() => {
+    getInvit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  /**
+   * Gère le changement de date.
+   *
+   * @param {Date | null} date - La date sélectionnée.
+   */
   const handleDateChange = (date: Date | null) => {
     if (!date) return;
     onDateChange(date);
   };
 
-  useEffect(() => {
-    getInvits();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  /**
+   * Ouvre la modal d'invitation.
+   */
+  const openInvitModal = (): void => {
+    onInvitModalOpen();
+  };
 
-  const [email, setEmail] = useState("");
+  /**
+   * Ouvre la modal de notifications.
+   */
+  const openNotifModal = (): void => {
+    getUsers();
+    onNotifModalOpen();
+  };
 
+  /**
+   * Ferme la modal en cours.
+   */
+  const closeModal = () => {
+    if (isInvitModalOpen) {
+      onInvitModalClose();
+    } else {
+      onNotifModalClose();
+    }
+  };
+
+  /**
+   * Envoie une invitation à l'adresse e-mail spécifiée.
+   */
   const sendInvit = async () => {
     if (email === "") {
       toast({
@@ -77,6 +109,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
         },
         {
           headers: {
+            "Content-Type": "application/json",
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         },
@@ -103,20 +136,9 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
       });
   };
 
-  const openInvitModal = (): void => {
-    onInvitModalOpen();
-  };
-
-  const openNotifModal = (): void => {
-    getUsers();
-    onNotifModalOpen();
-  };
-
-  const closeModal = () => {
-    onInvitModalClose();
-    onNotifModalClose();
-  };
-
+  /**
+   * Récupère la liste des utilisateurs depuis le serveur.
+   */
   const getUsers = async () => {
     try {
       const response = await axios.get("https://meteoplus.fly.dev/users/", {
@@ -139,7 +161,10 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
     }
   };
 
-  const getInvits = async () => {
+  /**
+   * Récupère la liste des invitations depuis le serveur.
+   */
+  const getInvit = async () => {
     try {
       const response = await axios.get("https://meteoplus.fly.dev/invits", {
         headers: {
@@ -148,7 +173,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
         },
       });
       console.log("Invitation récupéré :", response.data);
-      setNotifications(response.data);
+      setInvits(response.data);
     } catch (error: any) {
       console.error("Erreur lors de la récupération des invitations", error);
       toast({
@@ -161,9 +186,68 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
     }
   };
 
-  const acceptInvit = async (id: number) => {};
+  /**
+   * Accepte une invitation spécifiée par son identifiant.
+   *
+   * @param {number} id - Identifiant de l'invitation à accepter.
+   */
+  const acceptInvit = async (id: number) => {
+    try {
+      const response = await axios.patch(`https://meteoplus.fly.dev/invits/${id}`, {
+        status: "200",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      console.log("Invitation acceptée :", response.data);
+      getInvit();
+      toast({
+        title: "Invitation acceptée",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error: any) {
+      console.error("Erreur lors de l'acceptation de l'invitation", error);
+      toast({
+        title: "Erreur lors de l'acceptation de l'invitation",
+        description: error.response.data.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
 
-  const refuseInvit = async (id: number) => {};
+  const refuseInvit = async (id: number) => {
+    try {
+      const response = await axios.patch(`https://meteoplus.fly.dev/invits/${id}`, {
+        status: "300",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      console.log("Invitation refusée :", response.data);
+      getInvit();
+      toast({
+        title: "Invitation refusée",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
+      });
+    } catch (error: any) {
+      console.error("Erreur lors du refus de l'invitation", error);
+      toast({
+        title: "Erreur lors du refus de l'invitation",
+        description: error.response.data.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
 
   return (
     <Flex as="nav" align="center" gap={10} padding="1.5rem" backgroundColor="#FFFFFF" justifyContent={"space-between"}>
@@ -228,7 +312,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
           <ModalOverlay />
           <ModalContent>
             <ModalHeader fontSize={25} fontWeight={"bold"}>
-              Notifications
+              Invits
             </ModalHeader>
             <ModalCloseButton />
             <ModalBody>
@@ -237,10 +321,10 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
                 <Text alignSelf={"baseline"} fontSize={20} fontWeight={"bold"}>
                   Invitations
                 </Text>
-                {notifications.length > 0 ? (
-                  notifications.map((notif) => (
-                    <React.StrictMode>
-                      <Text key={notif.id} mt={5} mb={30} fontWeight={500}>
+                {Invits.length > 0 ? (
+                  Invits.map((notif) => (
+                    <React.StrictMode key={notif.id}>
+                      <Text mt={5} mb={30} fontWeight={500}>
                         {users.find((user) => user.id === notif.senderId)?.name ?? "inconnu"} vous a invité
                       </Text>
                       <Flex justifyContent={"space-around"}>
@@ -267,7 +351,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
                   ))
                 ) : (
                   <Text mt={30} mb={30}>
-                    Aucune notification
+                    Aucune Invit
                   </Text>
                 )}
               </Flex>
@@ -276,7 +360,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
         </Modal>
 
         <Box _hover={{ cursor: "pointer" }} onClick={openNotifModal} mr={10} mt={-5}>
-          {notifications.length > 0 && (
+          {Invits.length > 0 && (
             <Flex
               position={"relative"}
               w={5}
@@ -288,7 +372,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
               left={"90%"}
               top={"10px"}
             >
-              <Text fontSize={15}>{notifications.length}</Text>
+              <Text fontSize={15}>{Invits.length}</Text>
             </Flex>
           )}
 

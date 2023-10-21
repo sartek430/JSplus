@@ -1,27 +1,25 @@
-import React from "react";
 import {
-  Flex,
-  Text,
-  Input,
+  Box,
   Button,
+  Flex,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  Box,
+  Text,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FaRegBell } from "react-icons/fa";
-import { useToast } from "@chakra-ui/react";
-import { useState } from "react";
-import { useDisclosure } from "@chakra-ui/react";
 
-type navbarProps = {
+interface NavbarProps {
   onDateChange: (date: Date) => void;
-};
+}
 
 interface Notification {
   id: number;
@@ -36,23 +34,15 @@ interface User {
   email: string;
 }
 
-export default function Navbar({ onDateChange }: navbarProps) {
+const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
   const currentDate = new Date();
   const maxDate = new Date(currentDate);
   maxDate.setDate(currentDate.getDate() + 6);
   const toast = useToast();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const {
-    isOpen: isInvitModalOpen,
-    onOpen: onInvitModalOpen,
-    onClose: onInvitModalClose,
-  } = useDisclosure();
+  const { isOpen: isInvitModalOpen, onOpen: onInvitModalOpen, onClose: onInvitModalClose } = useDisclosure();
 
-  const {
-    isOpen: isNotifModalOpen,
-    onOpen: onNotifModalOpen,
-    onClose: onNotifModalClose,
-  } = useDisclosure();
+  const { isOpen: isNotifModalOpen, onOpen: onNotifModalOpen, onClose: onNotifModalClose } = useDisclosure();
   const [users, setUsers] = useState<User[]>([]);
 
   const handleDateChange = (date: Date | null) => {
@@ -89,7 +79,7 @@ export default function Navbar({ onDateChange }: navbarProps) {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
-        }
+        },
       )
       .then((response) => {
         console.log(response);
@@ -176,14 +166,7 @@ export default function Navbar({ onDateChange }: navbarProps) {
   const refuseInvit = async (id: number) => {};
 
   return (
-    <Flex
-      as="nav"
-      align="center"
-      gap={10}
-      padding="1.5rem"
-      backgroundColor="#FFFFFF"
-      justifyContent={"space-between"}
-    >
+    <Flex as="nav" align="center" gap={10} padding="1.5rem" backgroundColor="#FFFFFF" justifyContent={"space-between"}>
       <Flex justify="space-between">
         <Text color="#0E487D" fontWeight={"bold"} fontSize={35}>
           Tableau de bord
@@ -198,6 +181,8 @@ export default function Navbar({ onDateChange }: navbarProps) {
           placeholder="Select Date and Time"
           size="md"
           type="datetime-local"
+          min={currentDate.toISOString().slice(0, 16)}
+          max={maxDate.toISOString().slice(0, 16)}
         />
       </Flex>
 
@@ -226,23 +211,11 @@ export default function Navbar({ onDateChange }: navbarProps) {
             <ModalCloseButton />
             <ModalBody>
               <Flex flexDirection={"column"} alignItems={"center"}>
-                <Box
-                  w={"80%"}
-                  h={1}
-                  bg={"#0E487D"}
-                  mt={"-10px"}
-                  mb={"20px"}
-                  borderRadius={"full"}
-                />
+                <Box w={"80%"} h={1} bg={"#0E487D"} mt={"-10px"} mb={"20px"} borderRadius={"full"} />
                 <Text alignSelf={"baseline"} fontSize={20} fontWeight={"bold"}>
                   Insérer addresse mail{" "}
                 </Text>
-                <Input
-                  mt={5}
-                  mb={5}
-                  placeholder="Addresse mail"
-                  onChange={(e) => setEmail(e.target.value)}
-                ></Input>
+                <Input mt={5} mb={5} placeholder="Addresse mail" onChange={(e) => setEmail(e.target.value)}></Input>
                 <Button alignSelf={"end"} mt={"20px"} onClick={sendInvit}>
                   Inviter
                 </Button>
@@ -260,14 +233,7 @@ export default function Navbar({ onDateChange }: navbarProps) {
             <ModalCloseButton />
             <ModalBody>
               <Flex flexDirection={"column"} alignItems={"center"}>
-                <Box
-                  w={"80%"}
-                  h={1}
-                  bg={"#0E487D"}
-                  mt={"-10px"}
-                  mb={"20px"}
-                  borderRadius={"full"}
-                />
+                <Box w={"80%"} h={1} bg={"#0E487D"} mt={"-10px"} mb={"20px"} borderRadius={"full"} />
                 <Text alignSelf={"baseline"} fontSize={20} fontWeight={"bold"}>
                   Invitations
                 </Text>
@@ -275,9 +241,7 @@ export default function Navbar({ onDateChange }: navbarProps) {
                   notifications.map((notif) => (
                     <React.StrictMode>
                       <Text key={notif.id} mt={5} mb={30} fontWeight={500}>
-                        {users.find((user) => user.id === notif.senderId)
-                          ?.name ?? "inconnu"}{" "}
-                        vous a invité
+                        {users.find((user) => user.id === notif.senderId)?.name ?? "inconnu"} vous a invité
                       </Text>
                       <Flex justifyContent={"space-around"}>
                         <Button m={4} onClick={() => refuseInvit(notif.id)}>
@@ -311,12 +275,7 @@ export default function Navbar({ onDateChange }: navbarProps) {
           </ModalContent>
         </Modal>
 
-        <Box
-          _hover={{ cursor: "pointer" }}
-          onClick={openNotifModal}
-          mr={10}
-          mt={-5}
-        >
+        <Box _hover={{ cursor: "pointer" }} onClick={openNotifModal} mr={10} mt={-5}>
           {notifications.length > 0 && (
             <Flex
               position={"relative"}
@@ -338,4 +297,6 @@ export default function Navbar({ onDateChange }: navbarProps) {
       </Flex>
     </Flex>
   );
-}
+};
+
+export default Navbar;

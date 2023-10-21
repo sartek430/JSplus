@@ -1,23 +1,10 @@
-import { useState } from "react";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { useToast } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Box, Button, Flex, Image, Input, InputGroup, InputRightElement, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
-import {
-  Flex,
-  Text,
-  Box,
-  Input,
-  Button,
-  InputGroup,
-  InputRightElement,
-  Image,
-} from "@chakra-ui/react";
-import image from "../assets/image/Orage.jpg";
-import React from "react";
+import React, { useState } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function Login() {
+const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -55,7 +42,7 @@ export default function Login() {
             "Access-Control-Allow-Origin": "*",
             "ngrok-skip-browser-warning": "*",
           },
-        }
+        },
       )
       .then((response) => {
         console.log("Utilisateur connecté :", response.data);
@@ -103,13 +90,7 @@ export default function Login() {
         >
           Connecte toi !
         </Text>
-        <Box
-          w="45%"
-          h={"3px"}
-          bg={"#0E487D"}
-          borderRadius={"full"}
-          mt={"10px"}
-        ></Box>
+        <Box w="45%" h={"3px"} bg={"#0E487D"} borderRadius={"full"} mt={"10px"}></Box>
         <Input
           w={"50%"}
           mt={"60px"}
@@ -157,12 +138,7 @@ export default function Login() {
         <Text textAlign="center" mt={"30px"}>
           <Text as="span">Tu n'as pas de compte ?</Text>{" "}
           <Link to="/signup">
-            <Text
-              as="span"
-              color="brand.500"
-              textDecoration={"none"}
-              fontWeight={"bold"}
-            >
+            <Text as="span" color="brand.500" textDecoration={"none"} fontWeight={"bold"}>
               Inscris toi !
             </Text>
           </Link>
@@ -185,15 +161,11 @@ export default function Login() {
           Connexion !
         </Button>
 
-        <Box
-          w="45%"
-          h={"3px"}
-          bg={"#0E487D"}
-          borderRadius={"full"}
-          mt={"40px"}
-        ></Box>
+        <Box w="45%" h={"3px"} bg={"#0E487D"} borderRadius={"full"} mt={"40px"}></Box>
       </Flex>
-      <Image src={image} h={"100vh"} w={"43%"}></Image>
+      <Image src={"assets/image/Orage.jpg"} h={"100vh"} w={"43%"}></Image>
     </Flex>
   );
-}
+};
+
+export default Login;

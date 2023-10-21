@@ -1,22 +1,10 @@
-import {
-  Flex,
-  Image,
-  Text,
-  Box,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Button,
-} from "@chakra-ui/react";
-import { Link } from "react-router-dom";
-import image from "../assets/image/Belle Nature 3560044.jpg";
+import { Box, Button, Flex, Image, Input, InputGroup, InputRightElement, Text, useToast } from "@chakra-ui/react";
+import axios from "axios";
 import { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { useToast } from "@chakra-ui/react";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function Signup() {
+const Signup: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -32,45 +20,45 @@ export default function Signup() {
 
   const connection = (): void => {
     axios
-    .post(
-      "https://meteoplus.fly.dev/login",
-      {
-        email: email,
-        password: password,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          "Access-Control-Allow-Origin": "*",
-          "ngrok-skip-browser-warning": "*",
+      .post(
+        "https://meteoplus.fly.dev/login",
+        {
+          email: email,
+          password: password,
         },
-      }
-    )
-    .then((response) => {
-      console.log("Utilisateur connecté :", response.data);
-      toast({
-        title: "Utilisateur connecté avec succès",
-        status: "success",
-        duration: 3000,
-        isClosable: true,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "ngrok-skip-browser-warning": "*",
+          },
+        },
+      )
+      .then((response) => {
+        console.log("Utilisateur connecté :", response.data);
+        toast({
+          title: "Utilisateur connecté avec succès",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        localStorage.setItem("token", response.data.token);
+        navigate("/accueil");
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la connection de l'utilisateur :", error);
+        toast({
+          title: "Erreur lors de la connection de l'utilisateur",
+          description: error.response.data.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
       });
-      localStorage.setItem("token", response.data.token);
-      navigate("/accueil");
-    })
-    .catch((error) => {
-      console.error("Erreur lors de la connection de l'utilisateur :", error);
-      toast({
-        title: "Erreur lors de la connection de l'utilisateur",
-        description: error.response.data.message,
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-    });
   };
 
   const createAcount = (): void => {
-    if(email === "" || password === "" || username === ""){
+    if (email === "" || password === "" || username === "") {
       toast({
         title: "Erreur lors de la création de l'utilisateur",
         description: "Un des champs est vide",
@@ -85,9 +73,9 @@ export default function Signup() {
       .post(
         "https://meteoplus.fly.dev/users",
         {
-            email: email,
-            password: password,
-            name: username,
+          email: email,
+          password: password,
+          name: username,
         },
         {
           headers: {
@@ -95,7 +83,7 @@ export default function Signup() {
             "Access-Control-Allow-Origin": "*",
             "ngrok-skip-browser-warning": "*",
           },
-        }
+        },
       )
       .then((response) => {
         // Gérer la réponse réussie ici
@@ -109,10 +97,7 @@ export default function Signup() {
         connection();
       })
       .catch((error) => {
-        console.error(
-          "Erreur lors de la création de l'utilisateur :",
-          error.message
-        );
+        console.error("Erreur lors de la création de l'utilisateur :", error.message);
         toast({
           title: "Erreur lors de la création de l'utilisateur",
           description: error.response.data.message[0],
@@ -145,13 +130,7 @@ export default function Signup() {
         >
           Bienvenue sur Météo+ !
         </Text>
-        <Box
-          w="45%"
-          h={"3px"}
-          bg={"#0E487D"}
-          borderRadius={"full"}
-          mt={"10px"}
-        ></Box>
+        <Box w="45%" h={"3px"} bg={"#0E487D"} borderRadius={"full"} mt={"10px"}></Box>
         <Input
           w={"50%"}
           mt={"60px"}
@@ -215,12 +194,7 @@ export default function Signup() {
         <Text textAlign="center">
           <Text as="span">Tu as déjà un compte ?</Text>{" "}
           <Link to="/login">
-            <Text
-              as="span"
-              color="brand.500"
-              textDecoration={"none"}
-              fontWeight={"bold"}
-            >
+            <Text as="span" color="brand.500" textDecoration={"none"} fontWeight={"bold"}>
               Connecte toi !
             </Text>
           </Link>
@@ -243,15 +217,11 @@ export default function Signup() {
           Créer ton compte !
         </Button>
 
-        <Box
-          w="45%"
-          h={"3px"}
-          bg={"#0E487D"}
-          borderRadius={"full"}
-          mt={"40px"}
-        ></Box>
+        <Box w="45%" h={"3px"} bg={"#0E487D"} borderRadius={"full"} mt={"40px"}></Box>
       </Flex>
-      <Image src={image} h={"100vh"}></Image>
+      <Image src="assets/image/Belle Nature 3560044.jpg" h={"100vh"}></Image>
     </Flex>
   );
-}
+};
+
+export default Signup;

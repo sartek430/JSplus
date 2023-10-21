@@ -32,7 +32,9 @@ const WidgetCreation: React.FC<WidgetCreationProps> = ({
       justifyContent="space-evenly"
     >
       <Box style={{ marginLeft: "10px" }}>
-        <Text fontWeight="bold" mb={1}>Créer un Widget</Text>
+        <Text fontWeight="bold" mb={1}>
+          Créer un Widget
+        </Text>
         {loadingCreateWidgets ? (
           <Spinner />
         ) : (
@@ -51,12 +53,7 @@ const WidgetCreation: React.FC<WidgetCreationProps> = ({
 
             <Flex flexDirection="column">
               <label htmlFor="taille">Taille</label>
-              <select
-                name="taille"
-                id="taille"
-                value={taille}
-                onChange={(e) => setTaille(e.target.value)}
-              >
+              <select name="taille" id="taille" value={taille} onChange={(e) => setTaille(e.target.value)}>
                 <option value="SMALL">Petit</option>
                 <option value="MEDIUM">Grand</option>
               </select>

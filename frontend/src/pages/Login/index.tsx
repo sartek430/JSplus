@@ -1,7 +1,4 @@
-import {
-  Box, Button, Flex, Image, Input, InputGroup,
-  InputRightElement, Text, useToast
-} from "@chakra-ui/react";
+import { Box, Button, Flex, Image, Input, InputGroup, InputRightElement, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import React, { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
@@ -45,7 +42,7 @@ const Login: React.FC = () => {
             "Access-Control-Allow-Origin": "*",
             "ngrok-skip-browser-warning": "*",
           },
-        }
+        },
       )
       .then((response) => {
         console.log("Utilisateur connecté :", response.data);
@@ -93,13 +90,7 @@ const Login: React.FC = () => {
         >
           Connecte toi !
         </Text>
-        <Box
-          w="45%"
-          h={"3px"}
-          bg={"#0E487D"}
-          borderRadius={"full"}
-          mt={"10px"}
-        ></Box>
+        <Box w="45%" h={"3px"} bg={"#0E487D"} borderRadius={"full"} mt={"10px"}></Box>
         <Input
           w={"50%"}
           mt={"60px"}
@@ -147,12 +138,7 @@ const Login: React.FC = () => {
         <Text textAlign="center" mt={"30px"}>
           <Text as="span">Tu n'as pas de compte ?</Text>{" "}
           <Link to="/signup">
-            <Text
-              as="span"
-              color="brand.500"
-              textDecoration={"none"}
-              fontWeight={"bold"}
-            >
+            <Text as="span" color="brand.500" textDecoration={"none"} fontWeight={"bold"}>
               Inscris toi !
             </Text>
           </Link>
@@ -175,13 +161,7 @@ const Login: React.FC = () => {
           Connexion !
         </Button>
 
-        <Box
-          w="45%"
-          h={"3px"}
-          bg={"#0E487D"}
-          borderRadius={"full"}
-          mt={"40px"}
-        ></Box>
+        <Box w="45%" h={"3px"} bg={"#0E487D"} borderRadius={"full"} mt={"40px"}></Box>
       </Flex>
       <Image src={"assets/image/Orage.jpg"} h={"100vh"} w={"43%"}></Image>
     </Flex>

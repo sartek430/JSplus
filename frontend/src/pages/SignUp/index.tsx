@@ -1,14 +1,4 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Image,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, Image, Input, InputGroup, InputRightElement, Text, useToast } from "@chakra-ui/react";
 import axios from "axios";
 import { useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
@@ -42,7 +32,7 @@ const Signup: React.FC = () => {
             "Access-Control-Allow-Origin": "*",
             "ngrok-skip-browser-warning": "*",
           },
-        }
+        },
       )
       .then((response) => {
         console.log("Utilisateur connecté :", response.data);
@@ -93,7 +83,7 @@ const Signup: React.FC = () => {
             "Access-Control-Allow-Origin": "*",
             "ngrok-skip-browser-warning": "*",
           },
-        }
+        },
       )
       .then((response) => {
         // Gérer la réponse réussie ici
@@ -107,10 +97,7 @@ const Signup: React.FC = () => {
         connection();
       })
       .catch((error) => {
-        console.error(
-          "Erreur lors de la création de l'utilisateur :",
-          error.message
-        );
+        console.error("Erreur lors de la création de l'utilisateur :", error.message);
         toast({
           title: "Erreur lors de la création de l'utilisateur",
           description: error.response.data.message[0],
@@ -143,13 +130,7 @@ const Signup: React.FC = () => {
         >
           Bienvenue sur Météo+ !
         </Text>
-        <Box
-          w="45%"
-          h={"3px"}
-          bg={"#0E487D"}
-          borderRadius={"full"}
-          mt={"10px"}
-        ></Box>
+        <Box w="45%" h={"3px"} bg={"#0E487D"} borderRadius={"full"} mt={"10px"}></Box>
         <Input
           w={"50%"}
           mt={"60px"}
@@ -213,12 +194,7 @@ const Signup: React.FC = () => {
         <Text textAlign="center">
           <Text as="span">Tu as déjà un compte ?</Text>{" "}
           <Link to="/login">
-            <Text
-              as="span"
-              color="brand.500"
-              textDecoration={"none"}
-              fontWeight={"bold"}
-            >
+            <Text as="span" color="brand.500" textDecoration={"none"} fontWeight={"bold"}>
               Connecte toi !
             </Text>
           </Link>
@@ -241,13 +217,7 @@ const Signup: React.FC = () => {
           Créer ton compte !
         </Button>
 
-        <Box
-          w="45%"
-          h={"3px"}
-          bg={"#0E487D"}
-          borderRadius={"full"}
-          mt={"40px"}
-        ></Box>
+        <Box w="45%" h={"3px"} bg={"#0E487D"} borderRadius={"full"} mt={"40px"}></Box>
       </Flex>
       <Image src="assets/image/Belle Nature 3560044.jpg" h={"100vh"}></Image>
     </Flex>

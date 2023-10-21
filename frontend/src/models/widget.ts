@@ -1,6 +1,6 @@
 export enum EWidgetSize {
   SMALL = "SMALL",
-  MEDIUM = "MEDIUM"
+  MEDIUM = "MEDIUM",
 }
 
 export interface IWidgetDb {

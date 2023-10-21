@@ -37,47 +37,30 @@ const HomePage: React.FC = () => {
     if (widgets.length === 0) return;
     setWidgets(
       await Promise.all(
-        widgets.map(
-          async (widget: {
-            id: number;
-            displayName: string;
-            latitude: string;
-            longitude: string;
-          }) => {
-            const weather = await getWeather(widget.latitude, widget.longitude);
+        widgets.map(async (widget: { id: number; displayName: string; latitude: string; longitude: string }) => {
+          const weather = await getWeather(widget.latitude, widget.longitude);
 
-            const year = selectedDate.getFullYear();
-            const month = (selectedDate.getMonth() + 1)
-              .toString()
-              .padStart(2, "0");
-            const day = selectedDate.getDate().toString().padStart(2, "0");
-            const hours = selectedDate.getHours().toString().padStart(2, "0");
+          const year = selectedDate.getFullYear();
+          const month = (selectedDate.getMonth() + 1).toString().padStart(2, "0");
+          const day = selectedDate.getDate().toString().padStart(2, "0");
+          const hours = selectedDate.getHours().toString().padStart(2, "0");
 
-            const date = `${year}-${month}-${day}T${hours}:00`;
+          const date = `${year}-${month}-${day}T${hours}:00`;
 
-            const i = weather.hourly.time.indexOf(date) + 1;
+          const i = weather.hourly.time.indexOf(date) + 1;
 
-            return {
-              ...widget,
-              temperature: weather.hourly.temperature_2m[i],
-              humidity: weather.hourly.relativehumidity_2m[i],
-              wind: weather.hourly.windspeed_10m[i],
-              isSunny:
-                weather.hourly.weathercode[i] >= 0 &&
-                weather.hourly.weathercode[i] <= 3,
-              isCloudy:
-                weather.hourly.weathercode[i] >= 4 &&
-                weather.hourly.weathercode[i] <= 60,
-              isRainy:
-                weather.hourly.weathercode[i] >= 61 &&
-                weather.hourly.weathercode[i] <= 86,
-              isStormy:
-                weather.hourly.weathercode[i] >= 87 &&
-                weather.hourly.weathercode[i] <= 99,
-            };
-          }
-        )
-      )
+          return {
+            ...widget,
+            temperature: weather.hourly.temperature_2m[i],
+            humidity: weather.hourly.relativehumidity_2m[i],
+            wind: weather.hourly.windspeed_10m[i],
+            isSunny: weather.hourly.weathercode[i] >= 0 && weather.hourly.weathercode[i] <= 3,
+            isCloudy: weather.hourly.weathercode[i] >= 4 && weather.hourly.weathercode[i] <= 60,
+            isRainy: weather.hourly.weathercode[i] >= 61 && weather.hourly.weathercode[i] <= 86,
+            isStormy: weather.hourly.weathercode[i] >= 87 && weather.hourly.weathercode[i] <= 99,
+          };
+        }),
+      ),
     );
   }, [selectedDate]);
 
@@ -86,7 +69,7 @@ const HomePage: React.FC = () => {
       `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=temperature_2m,relativehumidity_2m,weathercode,windspeed_10m&timezone=Europe%2FLondon`,
       {
         method: "GET",
-      }
+      },
     );
 
     return await response.json();
@@ -95,7 +78,7 @@ const HomePage: React.FC = () => {
   const getCity = async () => {
     try {
       const response = await fetch(
-        `https://geocoding-api.open-meteo.com/v1/search?name=${ville}&count=1&language=fr&format=json`
+        `https://geocoding-api.open-meteo.com/v1/search?name=${ville}&count=1&language=fr&format=json`,
       );
       const data = await response.json();
 
@@ -106,9 +89,7 @@ const HomePage: React.FC = () => {
     }
   };
 
-  const createWidget = async (
-    e: React.FormEvent<HTMLFormElement>
-  ): Promise<void> => {
+  const createWidget = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
     setLoadingCreateWidgets(true);
 
@@ -172,17 +153,9 @@ const HomePage: React.FC = () => {
 
       <Flex display="flex" justify="space-evenly" flexWrap="wrap" align="center">
         {loadingWidgets ? (
-          <Spinner
-            thickness="4px"
-            speed="0.65s"
-            emptyColor="gray.200"
-            color="blue.500"
-            size="xl"
-          />
+          <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />
         ) : widgets.length > 0 ? (
-          widgets.map((widget: any, index: number) => (
-            <Widget key={index} widget={widget} index={index} />
-          ))
+          widgets.map((widget: any, index: number) => <Widget key={index} widget={widget} index={index} />)
         ) : (
           <Text>Vous n'avez pas encore de widgets.</Text>
         )}

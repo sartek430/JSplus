@@ -1,6 +1,6 @@
 import { Box, Text } from "@chakra-ui/react";
 
-const NotFound = () => {
+const NotFound: React.FC = () => {
   return (
     <Box>
       <Text>404</Text>

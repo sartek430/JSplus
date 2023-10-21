@@ -1,23 +1,11 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Image,
-  Spinner,
-  Text,
-  useToast,
-} from "@chakra-ui/react";
+import { Box, Flex, Image, Spinner, Text, useToast } from "@chakra-ui/react";
 import { useCallback, useEffect, useState } from "react";
-
 import "react-datepicker/dist/react-datepicker.css";
-import image from "../assets/image/Beautiful Weather.jpg";
-import cloudy from "../assets/image/icons/cloudy.png";
-import rain from "../assets/image/icons/rain.png";
-import storm from "../assets/image/icons/storm.png";
-import sunny from "../assets/image/icons/sun.png";
-import Navbar from "../components/Navbar";
+import Navbar from "../../components/Navbar";
+import Widget from "../../components/Widget";
+import WidgetCreation from "../../components/WidgetCreation";
 
-function HomePage() {
+const HomePage: React.FC = () => {
   const [widgets, setWidgets] = useState<any[]>([]);
   const [loadingWidgets, setLoadingWidgets] = useState(true);
   const [loadingCreateWidgets, setLoadingCreateWidgets] = useState(false);
@@ -118,7 +106,9 @@ function HomePage() {
     }
   };
 
-  const createWidget = async (e: any) => {
+  const createWidget = async (
+    e: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
     e.preventDefault();
     setLoadingCreateWidgets(true);
 
@@ -127,12 +117,14 @@ function HomePage() {
     if (!city) {
       setLoadingCreateWidgets(false);
 
-      return toast({
+      toast({
         title: "La ville n'a pas été trouvé",
         status: "error",
         duration: 3000,
         isClosable: true,
       });
+
+      return;
     }
 
     const token = localStorage.getItem("token");
@@ -169,7 +161,7 @@ function HomePage() {
   return (
     <Box>
       <Image
-        src={image}
+        src={"assets/image/Beautiful Weather.jpg"}
         position={"absolute"}
         zIndex={-10}
         h={"100vh"}
@@ -178,7 +170,7 @@ function HomePage() {
 
       <Navbar onDateChange={handleDateChange} />
 
-      <Flex display="flex" justify="space-evenly" flexWrap="wrap">
+      <Flex display="flex" justify="space-evenly" flexWrap="wrap" align="center">
         {loadingWidgets ? (
           <Spinner
             thickness="4px"
@@ -189,137 +181,23 @@ function HomePage() {
           />
         ) : widgets.length > 0 ? (
           widgets.map((widget: any, index: number) => (
-            <Box
-              key={index}
-              bg={"#FFFFFFA0"}
-              borderRadius={20}
-              p={4}
-              width={widget.size === "SMALL" ? "15%" : "40%"}
-              h="200px"
-              margin="50px"
-              flexDirection="row"
-              justifyContent="space-evenly"
-              display="flex"
-              alignItems="center"
-            >
-              <Box style={{ display: "flex", flexDirection: "row" }}>
-                <Box style={{ marginLeft: "10px" }}>
-                  <Text style={{ fontSize: "20px" }}>{widget.displayName}</Text>
-                  <Flex flexDirection="row" alignItems={"center"}>
-                    <Image
-                      src={
-                        widget.isSunny
-                          ? sunny
-                          : widget.isCloudy
-                          ? cloudy
-                          : widget.isRainy
-                          ? rain
-                          : storm
-                      }
-                      alt="weather"
-                      width={widget.size === "SMALL" ? "50px" : "100px"}
-                      style={{ marginRight: "10px" }}
-                    />
-
-                    {!widget.temperature ? (
-                      <Spinner />
-                    ) : (
-                      <Text style={{ fontSize: "35px", fontWeight: "bold" }}>
-                        {widget.temperature}°C
-                      </Text>
-                    )}
-                  </Flex>
-                </Box>
-              </Box>
-              {widget.size !== "SMALL" && (
-                <Box
-                  style={{
-                    fontSize: "20px",
-                    textAlign: "left",
-                    lineHeight: "40px",
-                  }}
-                >
-                  <Flex>
-                    Humidité :{" "}
-                    {!widget.humidity ? (
-                      <Spinner />
-                    ) : (
-                      <Text ml={2}> {widget.humidity} </Text>
-                    )}
-                    %
-                  </Flex>
-                  <Flex>
-                    Vent :{" "}
-                    {!widget.wind ? (
-                      <Spinner />
-                    ) : (
-                      <Text ml={2}> {widget.wind}</Text>
-                    )}
-                    km/h
-                  </Flex>
-                </Box>
-              )}
-            </Box>
+            <Widget key={index} widget={widget} index={index} />
           ))
         ) : (
           <Text>Vous n'avez pas encore de widgets.</Text>
         )}
 
-        <Box
-          bg={"#FFFFFFA0"}
-          borderRadius={20}
-          p={4}
-          width="15%"
-          h="200px"
-          textAlign="center"
-          display="flex"
-          margin="50px"
-          flexDirection="column"
-          justifyContent="space-evenly"
-        >
-          <Box style={{ marginLeft: "10px" }}>
-            <Text>Créer un Widget</Text>
-            {loadingCreateWidgets ? (
-              <Spinner />
-            ) : (
-              <form onSubmit={createWidget}>
-                <Box>
-                  <label htmlFor="taille">Taille :</label>
-                  <select
-                    name="taille"
-                    id="taille"
-                    value={taille}
-                    onChange={(e) => setTaille(e.target.value)}
-                  >
-                    <option value="SMALL">Petit</option>
-                    <option value="MEDIUM">Grand</option>
-                  </select>
-                </Box>
-
-                <Box>
-                  <label htmlFor="ville">Ville :</label>
-                  <input
-                    type="text"
-                    name="ville"
-                    id="ville"
-                    placeholder="Nom de la ville"
-                    value={ville}
-                    onChange={(e) => setVille(e.target.value)}
-                  />
-                </Box>
-
-                <Box>
-                  <Button bg={"none"} type="submit" _hover={{ bg: "none" }}>
-                    Créer Widget
-                  </Button>
-                </Box>
-              </form>
-            )}
-          </Box>
-        </Box>
+        <WidgetCreation
+          loadingCreateWidgets={loadingCreateWidgets}
+          createWidget={createWidget}
+          taille={taille}
+          setTaille={setTaille}
+          ville={ville}
+          setVille={setVille}
+        />
       </Flex>
     </Box>
   );
-}
+};
 
 export default HomePage;

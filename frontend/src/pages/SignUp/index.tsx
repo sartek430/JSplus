@@ -1,47 +1,34 @@
-import { useState } from "react";
-import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { useToast } from "@chakra-ui/react";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import {
-  Flex,
-  Text,
   Box,
-  Input,
   Button,
+  Flex,
+  Image,
+  Input,
   InputGroup,
   InputRightElement,
-  Image,
+  Text,
+  useToast,
 } from "@chakra-ui/react";
-import image from "../assets/image/Orage.jpg";
-import React from "react";
+import axios from "axios";
+import { useState } from "react";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function Login() {
+const Signup: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
+  const [username, setUsername] = useState("");
   const toast = useToast();
+  const navigate = useNavigate();
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
-      connection();
+      createAcount();
     }
   };
 
   const connection = (): void => {
-    if (email === "" || password === "") {
-      toast({
-        title: "Erreur lors de la connection de l'utilisateur",
-        description: "Un des champs est vide",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
-      return;
-    }
-
     axios
       .post(
         "https://meteoplus.fly.dev/login",
@@ -65,8 +52,7 @@ export default function Login() {
           duration: 3000,
           isClosable: true,
         });
-        localStorage.setItem("token", response.data.access_token);
-        console.log("token :", response.data.access_token);
+        localStorage.setItem("token", response.data.token);
         navigate("/accueil");
       })
       .catch((error) => {
@@ -74,6 +60,60 @@ export default function Login() {
         toast({
           title: "Erreur lors de la connection de l'utilisateur",
           description: error.response.data.message,
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      });
+  };
+
+  const createAcount = (): void => {
+    if (email === "" || password === "" || username === "") {
+      toast({
+        title: "Erreur lors de la création de l'utilisateur",
+        description: "Un des champs est vide",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    axios
+      .post(
+        "https://meteoplus.fly.dev/users",
+        {
+          email: email,
+          password: password,
+          name: username,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "Access-Control-Allow-Origin": "*",
+            "ngrok-skip-browser-warning": "*",
+          },
+        }
+      )
+      .then((response) => {
+        // Gérer la réponse réussie ici
+        console.log("Utilisateur créé :", response.data);
+        toast({
+          title: "Utilisateur créé avec succès",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+        connection();
+      })
+      .catch((error) => {
+        console.error(
+          "Erreur lors de la création de l'utilisateur :",
+          error.message
+        );
+        toast({
+          title: "Erreur lors de la création de l'utilisateur",
+          description: error.response.data.message[0],
           status: "error",
           duration: 3000,
           isClosable: true,
@@ -101,7 +141,7 @@ export default function Login() {
           fontSize={"35px"}
           fontWeight={700}
         >
-          Connecte toi !
+          Bienvenue sur Météo+ !
         </Text>
         <Box
           w="45%"
@@ -125,9 +165,25 @@ export default function Login() {
           onKeyDown={handleKeyPress}
         />
 
+        <Input
+          w={"50%"}
+          mt={"60px"}
+          variant="outline"
+          placeholder="Nom d'utilisateur"
+          h={"50px"}
+          bg={"#FFFFFF"}
+          borderColor={"#2583DA"}
+          border={"2px"}
+          color={"#2583DA"}
+          _hover={{ borderColor: "#0E487D" }}
+          onChange={(e) => setUsername(e.target.value)}
+          onKeyDown={handleKeyPress}
+        />
+
         <InputGroup alignItems="center" justifyContent={"center"}>
           <Input
             mt={"60px"}
+            mb={"40px"}
             h="50px"
             variant="outline"
             w={"50%"}
@@ -154,22 +210,22 @@ export default function Login() {
           </InputRightElement>
         </InputGroup>
 
-        <Text textAlign="center" mt={"30px"}>
-          <Text as="span">Tu n'as pas de compte ?</Text>{" "}
-          <Link to="/signup">
+        <Text textAlign="center">
+          <Text as="span">Tu as déjà un compte ?</Text>{" "}
+          <Link to="/login">
             <Text
               as="span"
               color="brand.500"
               textDecoration={"none"}
               fontWeight={"bold"}
             >
-              Inscris toi !
+              Connecte toi !
             </Text>
           </Link>
         </Text>
 
         <Button
-          mt={"40px"}
+          mt={"60px"}
           w={"50%"}
           h={"50px"}
           bgGradient={"linear(to-r, #2583DA, #0E487D)"}
@@ -180,9 +236,9 @@ export default function Login() {
           }}
           _active={{ transform: "scale(0.9)" }}
           boxShadow={"-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"}
-          onClick={connection}
+          onClick={createAcount}
         >
-          Connexion !
+          Créer ton compte !
         </Button>
 
         <Box
@@ -193,7 +249,9 @@ export default function Login() {
           mt={"40px"}
         ></Box>
       </Flex>
-      <Image src={image} h={"100vh"} w={"43%"}></Image>
+      <Image src="assets/image/Belle Nature 3560044.jpg" h={"100vh"}></Image>
     </Flex>
   );
-}
+};
+
+export default Signup;

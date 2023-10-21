@@ -1,27 +1,25 @@
-import React from "react";
 import {
-  Flex,
-  Text,
-  Input,
+  Box,
   Button,
+  Flex,
+  Input,
   Modal,
   ModalBody,
   ModalCloseButton,
   ModalContent,
   ModalHeader,
   ModalOverlay,
-  Box,
+  Text,
+  useDisclosure,
+  useToast,
 } from "@chakra-ui/react";
 import axios from "axios";
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { FaRegBell } from "react-icons/fa";
-import { useToast } from "@chakra-ui/react";
-import { useState } from "react";
-import { useDisclosure } from "@chakra-ui/react";
 
-type navbarProps = {
+interface NavbarProps {
   onDateChange: (date: Date) => void;
-};
+}
 
 interface Notification {
   id: number;
@@ -36,7 +34,7 @@ interface User {
   email: string;
 }
 
-export default function Navbar({ onDateChange }: navbarProps) {
+const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
   const currentDate = new Date();
   const maxDate = new Date(currentDate);
   maxDate.setDate(currentDate.getDate() + 6);
@@ -338,4 +336,6 @@ export default function Navbar({ onDateChange }: navbarProps) {
       </Flex>
     </Flex>
   );
-}
+};
+
+export default Navbar;

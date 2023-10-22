@@ -27,6 +27,7 @@ import { Invit } from "../../models/invit.ts";
  */
 interface NavbarProps {
   onDateChange: (date: Date) => void;
+  dashboardName?: string;
 }
 
 /**
@@ -34,7 +35,7 @@ interface NavbarProps {
  *
  * @param {NavbarProps} props - Propriétés du composant Navbar.
  */
-const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
+const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }) => {
   const currentDate = new Date();
   const maxDate = new Date(currentDate);
   maxDate.setDate(currentDate.getDate() + 6);
@@ -114,8 +115,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
           },
         },
       )
-      .then((response) => {
-        console.log(response);
+      .then(() => {
         closeModal();
         toast({
           title: "Invitation envoyée avec succès",
@@ -147,7 +147,6 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      console.log("Expéditeur(s) récupéré(s) :", response.data);
       setUsers(response.data);
     } catch (error: any) {
       console.error("Erreur lors de la récupération des expéditeurs", error);
@@ -172,7 +171,6 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      console.log("Invitation récupéré :", response.data);
       setInvits(response.data);
     } catch (error: any) {
       console.error("Erreur lors de la récupération des invitations", error);
@@ -193,7 +191,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
    */
   const acceptInvit = async (id: number) => {
     try {
-      const response = await axios.patch(
+      await axios.patch(
         `https://meteoplus.fly.dev/invits/${id}`,
         {
           status: 200,
@@ -206,7 +204,6 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
         },
       );
 
-      console.log("Invitation acceptée :", response.data);
       getInvit(); // Supposant que c'est une fonction à appeler pour rafraîchir les données
       toast({
         title: "Invitation acceptée",
@@ -269,7 +266,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
     <Flex as="nav" align="center" gap={10} padding="1.5rem" backgroundColor="#FFFFFF" justifyContent={"space-between"}>
       <Flex justify="space-between">
         <Text color="#0E487D" fontWeight={"bold"} fontSize={35}>
-          Tableau de bord
+          {dashboardName ? `Tableau de bord de ${dashboardName}` : "Tableau de bord"}
         </Text>
       </Flex>
       <Flex>

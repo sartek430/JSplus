@@ -21,20 +21,52 @@ const HomePage: React.FC = () => {
   const [taille, setTaille] = useState("SMALL");
   const [ville, setVille] = useState("");
 
+  const [dashboardUserName, setDashboardUserName] = useState<string>();
+
   const toast = useToast();
 
-  const getWigets = async () => {
+  const getWigets = async (id?: string) => {
+    const widgets: IWidget[] = [];
     const token = localStorage.getItem("token");
-    const response = await fetch("https://meteoplus.fly.dev/widgets", {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "ngrok-skip-browser-warning": "*",
-        "Access-Control-Allow-Origin": "*",
-      },
-    });
 
-    const widgets: any[] = await response.json();
+    if (id) {
+      const userResponse = await fetch(`https://meteoplus.fly.dev/users`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "*",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+      const users = await userResponse.json();
+      const user = users.find((user: any) => user.id == +id && Object.prototype.hasOwnProperty.call(user, "widgets"));
+
+      if (!user) {
+        toast({
+          title: "L'utilisateur n'a pas été trouvé",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+        return;
+      }
+
+      setDashboardUserName(user.name);
+      widgets.push(...user.widgets);
+    } else {
+      const response = await fetch("https://meteoplus.fly.dev/widgets", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "ngrok-skip-browser-warning": "*",
+          "Access-Control-Allow-Origin": "*",
+        },
+      });
+
+      const data = await response.json();
+
+      widgets.push(...data);
+    }
 
     setWidgets(widgets);
 
@@ -218,7 +250,7 @@ const HomePage: React.FC = () => {
   useEffect(() => {
     if (selectedDateRef.current === selectedDate) return;
     selectedDateRef.current = selectedDate;
-    getWigets();
+    getWigets(id);
   }, [selectedDate]);
 
   const handleDateChange = (date: Date) => {
@@ -228,14 +260,15 @@ const HomePage: React.FC = () => {
   return (
     // set /assets/image/Beautiful Weather.jpg as box background
     <Box bgImage="url('/assets/image/Beautiful Weather.jpg')" bgSize="cover" bgPosition="center" minH={"100vh"}>
-
-      <Navbar onDateChange={handleDateChange} />
+      <Navbar onDateChange={handleDateChange} dashboardName={dashboardUserName} />
 
       <Flex display="flex" justify="space-evenly" flexWrap="wrap" align="center">
         {loadingWidgets ? (
           <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />
         ) : widgets.length > 0 ? (
-          widgets.map((widget: any, index: number) => <Widget key={index} widget={widget} index={index} removeWidget={removeWidget} />)
+          widgets.map((widget: any, index: number) => (
+            <Widget key={index} widget={widget} index={index} removeWidget={removeWidget} />
+          ))
         ) : (
           <Text>Vous n'avez pas encore de widgets.</Text>
         )}

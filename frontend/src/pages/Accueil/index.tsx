@@ -1,23 +1,29 @@
 import { Box, Flex, Image, Spinner, Text, useToast } from "@chakra-ui/react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
+import { useParams } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import Widget from "../../components/Widget";
 import WidgetCreation from "../../components/WidgetCreation";
+import { EWidgetSize, IWidget } from "../../models/widget";
 
 const HomePage: React.FC = () => {
-  const [widgets, setWidgets] = useState<any[]>([]);
+  const { id } = useParams();
+
+  const [widgets, setWidgets] = useState<IWidget[]>([]);
   const [loadingWidgets, setLoadingWidgets] = useState(true);
   const [loadingCreateWidgets, setLoadingCreateWidgets] = useState(false);
 
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const selectedDateRef = useRef(selectedDate);
+  selectedDateRef.current = new Date(0);
 
   const [taille, setTaille] = useState("SMALL");
   const [ville, setVille] = useState("");
 
   const toast = useToast();
 
-  const getWigets = useCallback(async () => {
+  const getWigets = async () => {
     const token = localStorage.getItem("token");
     const response = await fetch("https://meteoplus.fly.dev/widgets", {
       method: "GET",
@@ -34,10 +40,20 @@ const HomePage: React.FC = () => {
 
     setLoadingWidgets(false);
 
-    if (widgets.length === 0) return;
-    setWidgets(
-      await Promise.all(
-        widgets.map(async (widget: { id: number; displayName: string; latitude: string; longitude: string }) => {
+    if (widgets.length === 0) {
+      createDefaultWidget();
+      return;
+    }
+
+    const newWidgets = await Promise.all(
+      widgets.map(
+        async (widget: {
+          id: number;
+          size: EWidgetSize;
+          displayName: string;
+          latitude: number;
+          longitude: number;
+        }): Promise<IWidget> => {
           const weather = await getWeather(widget.latitude, widget.longitude);
 
           const year = selectedDate.getFullYear();
@@ -59,12 +75,13 @@ const HomePage: React.FC = () => {
             isRainy: weather.hourly.weathercode[i] >= 61 && weather.hourly.weathercode[i] <= 86,
             isStormy: weather.hourly.weathercode[i] >= 87 && weather.hourly.weathercode[i] <= 99,
           };
-        }),
+        },
       ),
     );
-  }, [selectedDate]);
+    setWidgets(newWidgets);
+  };
 
-  const getWeather = async (lat: string, long: string) => {
+  const getWeather = async (lat: number | string, long: number | string) => {
     const response = await fetch(
       `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${long}&hourly=temperature_2m,relativehumidity_2m,weathercode,windspeed_10m&timezone=Europe%2FLondon`,
       {
@@ -131,23 +148,86 @@ const HomePage: React.FC = () => {
     setLoadingCreateWidgets(false);
   };
 
+  const removeWidget = (index: number) => {
+    const newWidgets = [...widgets];
+    newWidgets.splice(index, 1);
+    setWidgets(newWidgets);
+  };
+
+  const createDefaultWidget = () => {
+    if (widgets.length > 0) return;
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        setLoadingWidgets(true);
+
+        setWidgets([
+          {
+            id: 0,
+            displayName: "Chez moi",
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            size: EWidgetSize.MEDIUM,
+          } as IWidget,
+        ]);
+
+        const token = localStorage.getItem("token");
+
+        await fetch("https://meteoplus.fly.dev/widgets", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "ngrok-skip-browser-warning": "*",
+            "Access-Control-Allow-Origin": "*",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            displayName: "Chez moi",
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            size: EWidgetSize.MEDIUM,
+          }),
+        });
+
+        await getWigets();
+
+        toast({
+          title: "Géolocalisation trouvée",
+          description: "Un widget par défaut a été créé",
+          status: "success",
+          duration: 3000,
+          isClosable: true,
+        });
+      },
+      () => {
+        toast({
+          title: "La géolocalisation n'a pas été trouvée",
+          description: "Veuillez autoriser la géolocalisation pour créer un widget par défaut",
+          status: "error",
+          duration: 3000,
+          isClosable: true,
+        });
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 5000,
+        maximumAge: 0,
+      },
+    );
+  };
+
   useEffect(() => {
+    if (selectedDateRef.current === selectedDate) return;
+    selectedDateRef.current = selectedDate;
     getWigets();
-  }, [selectedDate, getWigets]);
+  }, [selectedDate]);
 
   const handleDateChange = (date: Date) => {
     setSelectedDate(date);
   };
 
   return (
-    <Box>
-      <Image
-        src={"assets/image/Beautiful Weather.jpg"}
-        position={"absolute"}
-        zIndex={-10}
-        h={"100vh"}
-        w={"100%"}
-      ></Image>
+    // set /assets/image/Beautiful Weather.jpg as box background
+    <Box bgImage="url('/assets/image/Beautiful Weather.jpg')" bgSize="cover" bgPosition="center" minH={"100vh"}>
 
       <Navbar onDateChange={handleDateChange} />
 
@@ -155,7 +235,7 @@ const HomePage: React.FC = () => {
         {loadingWidgets ? (
           <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />
         ) : widgets.length > 0 ? (
-          widgets.map((widget: any, index: number) => <Widget key={index} widget={widget} index={index} />)
+          widgets.map((widget: any, index: number) => <Widget key={index} widget={widget} index={index} removeWidget={removeWidget} />)
         ) : (
           <Text>Vous n'avez pas encore de widgets.</Text>
         )}

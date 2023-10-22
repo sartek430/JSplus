@@ -283,6 +283,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
           type="datetime-local"
           min={currentDate.toISOString().slice(0, 16)}
           max={maxDate.toISOString().slice(0, 16)}
+          defaultValue={currentDate.toISOString().slice(0, 16)}
         />
       </Flex>
 
@@ -367,7 +368,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange }) => {
                   ))
                 ) : (
                   <Text mt={30} mb={30}>
-                    Aucune Invit
+                    Aucune invitation
                   </Text>
                 )}
               </Flex>

@@ -26,7 +26,8 @@ export class InvitsService {
     const existingInvitQb = this.invitsRepository
       .createQueryBuilder('invit')
       .where('invit.senderId = :senderId', { senderId: user.id })
-      .andWhere('invit.receiverId = :receiverId', { receiverId: userFound.id });
+      .andWhere('invit.receiverId = :receiverId', { receiverId: userFound.id })
+      .andWhere('invit.status = :status', { status: EInvitStatus.PENDING });
     const existingInvit = await existingInvitQb.getOne();
 
     if (existingInvit) throw new ForbiddenException(['Invit already sent']);
@@ -34,7 +35,8 @@ export class InvitsService {
     const alreadyInvitedQb = this.invitsRepository
       .createQueryBuilder('invit')
       .where('invit.senderId = :senderId', { senderId: userFound.id })
-      .andWhere('invit.receiverId = :receiverId', { receiverId: user.id });
+      .andWhere('invit.receiverId = :receiverId', { receiverId: user.id })
+      .andWhere('invit.status = :status', { status: EInvitStatus.PENDING });
     const alreadyInvited = await alreadyInvitedQb.getOne();
 
     if (alreadyInvited) throw new ForbiddenException(['User already invited you']);
@@ -68,6 +70,6 @@ export class InvitsService {
   }
 
   findAll(user: IUserInfos) {
-    return this.invitsRepository.find({ where: { receiverId: user.id } });
+    return this.invitsRepository.find({ where: { receiverId: user.id, status: EInvitStatus.PENDING } });
   }
 }

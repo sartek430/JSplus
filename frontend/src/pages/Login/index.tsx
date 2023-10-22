@@ -54,7 +54,7 @@ const Login: React.FC = () => {
         });
         localStorage.setItem("token", response.data.access_token);
         console.log("token :", response.data.access_token);
-        navigate("/accueil");
+        navigate("/MeteoPlus/accueil");
       })
       .catch((error) => {
         console.error("Erreur lors de la connection de l'utilisateur :", error);
@@ -137,7 +137,7 @@ const Login: React.FC = () => {
 
         <Text textAlign="center" mt={"30px"}>
           <Text as="span">Tu n'as pas de compte ?</Text>{" "}
-          <Link to="/signup">
+          <Link to="/MeteoPlus/signup">
             <Text as="span" color="brand.500" textDecoration={"none"} fontWeight={"bold"}>
               Inscris toi !
             </Text>
@@ -163,7 +163,7 @@ const Login: React.FC = () => {
 
         <Box w="45%" h={"3px"} bg={"#0E487D"} borderRadius={"full"} mt={"40px"}></Box>
       </Flex>
-      <Image src={"assets/image/Orage.jpg"} h={"100vh"} w={"43%"}></Image>
+      <Image src={"/assets/image/Orage.jpg"} h={"100vh"} w={"43%"}></Image>
     </Flex>
   );
 };

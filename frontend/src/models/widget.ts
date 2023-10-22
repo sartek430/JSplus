@@ -16,6 +16,7 @@ export interface IWidget extends IWidgetDb {
   isSunny: boolean;
   isCloudy: boolean;
   isRainy: boolean;
+  isStormy: boolean;
   humidity: number;
   wind: number;
 }

@@ -6,7 +6,7 @@ import Navbar from "../../components/Navbar";
 import Widget from "../../components/Widget";
 import WidgetCreation from "../../components/WidgetCreation";
 import { EWidgetSize, IWidget } from "../../models/widget";
-import bgImage from "../../../public/assets/image/Beautiful Weather.jpg";
+import bgImage from "/assets/image/Gradient Background.jpg";
 
 const HomePage: React.FC = () => {
   const { id } = useParams();
@@ -252,6 +252,7 @@ const HomePage: React.FC = () => {
     if (selectedDateRef.current === selectedDate) return;
     selectedDateRef.current = selectedDate;
     getWigets(id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
 
   const handleDateChange = (date: Date) => {

@@ -196,7 +196,7 @@ const HomePage: React.FC = () => {
         setWidgets([
           {
             id: 0,
-            displayName: "Chez moi",
+            displayName: "Ma position",
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             size: EWidgetSize.MEDIUM,
@@ -214,7 +214,7 @@ const HomePage: React.FC = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            displayName: "Chez moi",
+            displayName: "Ma position",
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             size: EWidgetSize.MEDIUM,

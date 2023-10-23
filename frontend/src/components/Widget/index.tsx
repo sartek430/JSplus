@@ -21,10 +21,11 @@ import { IWidget } from "../../models/widget";
 interface WidgetProps {
   widget: IWidget;
   index: number;
+  canBeDeleted: boolean;
   removeWidget: (index: number) => void;
 }
 
-const Widget: React.FC<WidgetProps> = ({ widget, index, removeWidget }) => {
+const Widget: React.FC<WidgetProps> = ({ widget, index, removeWidget, canBeDeleted }) => {
   const { isOpen: isDeletionModalOpened, onOpen: onDeletionModalOpen, onClose: onDeletionModalClose } = useDisclosure();
   const [deletionLoading, setDeletionLoading] = useState(false);
 
@@ -123,16 +124,18 @@ const Widget: React.FC<WidgetProps> = ({ widget, index, removeWidget }) => {
       )}
       {/* display trash icon on hover */}
 
-      <Box position={"absolute"} right={"10px"} top={"10px"} opacity={0.5}>
-        <DeleteIcon
-          fontSize={"20px"}
-          color={"black"}
-          transition={"color 0.5s"}
-          cursor={"pointer"}
-          _hover={{ color: "red" }}
-          onClick={onDeletionModalOpen}
-        />
-      </Box>
+      {canBeDeleted && (
+        <Box position={"absolute"} right={"10px"} top={"10px"} opacity={0.5}>
+          <DeleteIcon
+            fontSize={"20px"}
+            color={"black"}
+            transition={"color 0.5s"}
+            cursor={"pointer"}
+            _hover={{ color: "red" }}
+            onClick={onDeletionModalOpen}
+          />
+        </Box>
+      )}
 
       <Modal isOpen={isDeletionModalOpened} onClose={onDeletionModalClose} isCentered size={"xl"}>
         <ModalOverlay bg="blackAlpha.300" backdropFilter="blur(5px) hue-rotate(10deg)" />

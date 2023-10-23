@@ -269,7 +269,7 @@ const HomePage: React.FC = () => {
           <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />
         ) : widgets.length > 0 ? (
           widgets.map((widget: any, index: number) => (
-            <Widget key={index} widget={widget} index={index} removeWidget={removeWidget} />
+            <Widget key={index} widget={widget} index={index} removeWidget={removeWidget} canBeDeleted={!id} />
           ))
         ) : (
           <Text>Vous n'avez pas encore de widgets.</Text>

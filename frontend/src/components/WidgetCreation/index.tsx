@@ -10,14 +10,7 @@ interface WidgetCreationProps {
   setVille: (ville: string) => void;
 }
 
-const WidgetCreation: React.FC<WidgetCreationProps> = ({
-  loadingCreateWidgets,
-  createWidget,
-  taille,
-  setTaille,
-  ville,
-  setVille,
-}) => {
+const WidgetCreation: React.FC<WidgetCreationProps> = ({ loadingCreateWidgets, createWidget, setTaille, setVille }) => {
   return (
     <Box
       bg={"#FFFFFFA0"}

@@ -1,4 +1,4 @@
-import { Box, Flex, Spinner, Text, useToast } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Text, useToast, Image } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useParams } from "react-router-dom";
@@ -6,6 +6,7 @@ import Navbar from "../../components/Navbar";
 import Widget from "../../components/Widget";
 import WidgetCreation from "../../components/WidgetCreation";
 import { EWidgetSize, IWidget } from "../../models/widget";
+import bgImage from "../../../public/assets/image/Beautiful Weather.jpg";
 
 const HomePage: React.FC = () => {
   const { id } = useParams();
@@ -258,8 +259,9 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    // set /assets/image/Beautiful Weather.jpg as box background
-    <Box bgImage="url('/assets/image/Beautiful Weather.jpg')" bgSize="cover" bgPosition="center" minH={"100vh"}>
+    <Box>
+      <Image src={bgImage} position={"fixed"} zIndex={-1} />
+
       <Navbar onDateChange={handleDateChange} dashboardName={dashboardUserName} />
 
       <Flex display="flex" justify="space-evenly" flexWrap="wrap" align="center">

@@ -126,7 +126,7 @@ const Widget: React.FC<WidgetProps> = ({ widget, index, removeWidget }) => {
       <Box position={"absolute"} right={"10px"} top={"10px"} opacity={0.5}>
         <DeleteIcon
           fontSize={"20px"}
-          color={"white"}
+          color={"black"}
           transition={"color 0.5s"}
           cursor={"pointer"}
           _hover={{ color: "red" }}

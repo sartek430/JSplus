@@ -5,11 +5,11 @@ import {
   UseGuards,
   Body,
   Logger,
-} from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthLoginDto } from './dto/auth-login.dto';
+} from "@nestjs/common";
+import { AuthService } from "./auth.service";
+import { AuthLoginDto } from "./dto/auth-login.dto";
 
-@Controller('login')
+@Controller("login")
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
   constructor(private authService: AuthService) {}

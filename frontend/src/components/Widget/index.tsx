@@ -28,6 +28,7 @@ interface WidgetProps {
 const Widget: React.FC<WidgetProps> = ({ widget, index, removeWidget, canBeDeleted }) => {
   const { isOpen: isDeletionModalOpened, onOpen: onDeletionModalOpen, onClose: onDeletionModalClose } = useDisclosure();
   const [deletionLoading, setDeletionLoading] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
 
   const toast = useToast();
 
@@ -84,6 +85,8 @@ const Widget: React.FC<WidgetProps> = ({ widget, index, removeWidget, canBeDelet
       display="flex"
       alignItems="center"
       position="relative"
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       <Box style={{ display: "flex", flexDirection: "row" }}>
         <Box style={{ marginLeft: "10px" }}>
@@ -125,14 +128,16 @@ const Widget: React.FC<WidgetProps> = ({ widget, index, removeWidget, canBeDelet
       {/* display trash icon on hover */}
 
       {canBeDeleted && (
-        <Box position={"absolute"} right={"10px"} top={"10px"} opacity={0.5}>
+        <Box position={"absolute"} right={"10px"} top={"10px"} opacity={isHovered ? 1 : 0} transition="opacity 0.3s">
           <DeleteIcon
             fontSize={"20px"}
             color={"black"}
-            transition={"color 0.5s"}
             cursor={"pointer"}
-            _hover={{ color: "red" }}
+            display={isHovered ? "block" : "none"}
             onClick={onDeletionModalOpen}
+            _hover={{ color: "red.400", transform: "scale(1.1)" }}
+            _active={{ transform: "scale(0.9)" }}
+            transition={"all 0.2s"}
           />
         </Box>
       )}

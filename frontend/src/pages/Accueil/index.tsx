@@ -141,6 +141,7 @@ const HomePage: React.FC = () => {
 
   const createWidget = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    console.log("ok");
     setLoadingCreateWidgets(true);
 
     const city = await getCity();

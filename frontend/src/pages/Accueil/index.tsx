@@ -275,14 +275,16 @@ const HomePage: React.FC = () => {
           <Text>Vous n'avez pas encore de widgets.</Text>
         )}
 
-        <WidgetCreation
-          loadingCreateWidgets={loadingCreateWidgets}
-          createWidget={createWidget}
-          taille={taille}
-          setTaille={setTaille}
-          ville={ville}
-          setVille={setVille}
-        />
+        {!id && (
+          <WidgetCreation
+            loadingCreateWidgets={loadingCreateWidgets}
+            createWidget={createWidget}
+            taille={taille}
+            setTaille={setTaille}
+            ville={ville}
+            setVille={setVille}
+          />
+        )}
       </Flex>
     </Box>
   );

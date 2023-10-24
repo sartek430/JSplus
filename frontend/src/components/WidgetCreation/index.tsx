@@ -1,29 +1,22 @@
-import { Box, Button, Flex, Spinner, Text } from "@chakra-ui/react";
+import { Box, Button, Flex, Spinner, Text, FormControl, FormLabel, Input, Select } from "@chakra-ui/react";
 import React from "react";
 
 interface WidgetCreationProps {
   loadingCreateWidgets: boolean;
-  createWidget: (e: React.FormEvent<HTMLFormElement>) => Promise<void>;
+  createWidget: (e: any) => Promise<void>;
   taille: string;
   setTaille: (taille: string) => void;
   ville: string;
   setVille: (ville: string) => void;
 }
 
-const WidgetCreation: React.FC<WidgetCreationProps> = ({
-  loadingCreateWidgets,
-  createWidget,
-  taille,
-  setTaille,
-  ville,
-  setVille,
-}) => {
+const WidgetCreation: React.FC<WidgetCreationProps> = ({ loadingCreateWidgets, createWidget, setTaille, setVille }) => {
   return (
     <Box
       bg={"#FFFFFFA0"}
       borderRadius={20}
       p={4}
-      width="15%"
+      width="20%"
       h="200px"
       textAlign="center"
       display="flex"
@@ -32,37 +25,59 @@ const WidgetCreation: React.FC<WidgetCreationProps> = ({
       justifyContent="space-evenly"
     >
       <Box style={{ marginLeft: "10px" }}>
-        <Text fontWeight="bold" mb={1}>
+        <Text fontWeight="bold" color={"#0E487D"} fontSize={15}>
           Créer un Widget
         </Text>
         {loadingCreateWidgets ? (
           <Spinner />
         ) : (
-          <form onSubmit={createWidget}>
-            <Flex flexDirection="column">
-              <label htmlFor="ville">Ville</label>
-              <input
+          <Flex flexDirection={"column"}>
+            <FormControl>
+              <FormLabel fontSize={10}>Ville</FormLabel>
+              <Input
+                size={"xs"}
                 type="text"
-                name="ville"
-                id="ville"
                 placeholder="Nom de la ville"
-                value={ville}
+                borderColor={"#0E487D"}
+                focusBorderColor="#0E487D"
+                _hover={{ borderColor: "#0E487D" }}
                 onChange={(e) => setVille(e.target.value)}
               />
-            </Flex>
 
-            <Flex flexDirection="column">
-              <label htmlFor="taille">Taille</label>
-              <select name="taille" id="taille" value={taille} onChange={(e) => setTaille(e.target.value)}>
+              <FormLabel fontSize={10} mt={2}>
+                Taille
+              </FormLabel>
+              <Select
+                size={"xs"}
+                placeholder="Select option"
+                borderColor={"#0E487D"}
+                focusBorderColor="#0E487D"
+                _hover={{ borderColor: "#0E487D" }}
+                onChange={(e) => setTaille(e.target.value)}
+                value={"SMALL"}
+              >
                 <option value="SMALL">Petit</option>
                 <option value="MEDIUM">Grand</option>
-              </select>
-            </Flex>
+              </Select>
+            </FormControl>
 
-            <Button type="submit" mt={4}>
+            <Button
+              size={"sm"}
+              mt={4}
+              bgGradient={"linear(to-r, #2583DA, #0E487D)"}
+              color={"#FFFFFF"}
+              _hover={{
+                bgGradient: "linear(to-r, #2583DA, #0E487D)",
+                transform: "scale(1.05)",
+              }}
+              _active={{ transform: "scale(0.9)" }}
+              boxShadow={"-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"}
+              fontSize={10}
+              onClick={createWidget}
+            >
               Ajouter
             </Button>
-          </form>
+          </Flex>
         )}
       </Box>
     </Box>

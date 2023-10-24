@@ -18,6 +18,9 @@ import React, { useEffect, useState } from "react";
 import { FaRegBell } from "react-icons/fa";
 import { User } from "../../models/user.ts";
 import { Invit } from "../../models/invit.ts";
+import { useNavigate } from "react-router-dom";
+import { FaUserFriends } from "react-icons/fa";
+import ContactModal from "./ContactModal/index.tsx";
 
 /**
  * Propriétés attendues par le composant Navbar.
@@ -35,7 +38,7 @@ interface NavbarProps {
  *
  * @param {NavbarProps} props - Propriétés du composant Navbar.
  */
-const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }) => {
+const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }: NavbarProps) => {
   const currentDate = new Date();
   const maxDate = new Date(currentDate);
   maxDate.setDate(currentDate.getDate() + 6);
@@ -45,9 +48,11 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }) => {
   const { isOpen: isNotifModalOpen, onOpen: onNotifModalOpen, onClose: onNotifModalClose } = useDisclosure();
   const [users, setUsers] = useState<User[]>([]);
   const [email, setEmail] = useState("");
+  const navigate = useNavigate();
+  const { isOpen: isContactModalOpen, onOpen: onContactModalOpen, onClose: onContactModalClose } = useDisclosure();
 
   useEffect(() => {
-    getInvit();
+    getUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -72,7 +77,6 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }) => {
    * Ouvre la modal de notifications.
    */
   const openNotifModal = (): void => {
-    getUsers();
     onNotifModalOpen();
   };
 
@@ -82,8 +86,10 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }) => {
   const closeModal = () => {
     if (isInvitModalOpen) {
       onInvitModalClose();
-    } else {
+    } else if (isNotifModalOpen) {
       onNotifModalClose();
+    } else if (isContactModalOpen) {
+      onContactModalClose();
     }
   };
 
@@ -373,7 +379,29 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }) => {
           </ModalContent>
         </Modal>
 
-        <Box _hover={{ cursor: "pointer" }} onClick={openNotifModal} mr={10} mt={-5}>
+        <Button
+          onClick={() => {
+            localStorage.removeItem("token");
+            navigate("/MeteoPlus/login");
+          }}
+          fontSize={20}
+          bg={"none"}
+          _hover={{
+            bg: "none",
+            transform: "scale(1.05)",
+          }}
+          _active={{ transform: "scale(0.9)" }}
+          color={"#000000"}
+          mr={5}
+        >
+          Se deconnecter
+        </Button>
+
+        <Box _hover={{ cursor: "pointer" }} onClick={onContactModalOpen} mr={10} mt={Invits.length > 0 ? -5 : 0}>
+          <FaUserFriends size={30} color={"#000000"} />
+        </Box>
+
+        <Box _hover={{ cursor: "pointer" }} onClick={openNotifModal} mr={10} mt={Invits.length > 0 ? -5 : 0}>
           {Invits.length > 0 && (
             <Flex
               position={"relative"}
@@ -393,6 +421,8 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }) => {
           <FaRegBell size={30} color={"#000000"} />
         </Box>
       </Flex>
+
+      <ContactModal isContactModalOpen={isContactModalOpen} closeModal={onContactModalClose} users={users} />
     </Flex>
   );
 };

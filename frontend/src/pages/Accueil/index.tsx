@@ -1,4 +1,4 @@
-import { Box, Flex, Spinner, Text, useToast } from "@chakra-ui/react";
+import { Box, Flex, Spinner, Text, useToast, Image } from "@chakra-ui/react";
 import { useEffect, useRef, useState } from "react";
 import "react-datepicker/dist/react-datepicker.css";
 import { useParams } from "react-router-dom";
@@ -6,6 +6,7 @@ import Navbar from "../../components/Navbar";
 import Widget from "../../components/Widget";
 import WidgetCreation from "../../components/WidgetCreation";
 import { EWidgetSize, IWidget } from "../../models/widget";
+import bgImage from "/assets/image/Gradient Background.jpg";
 
 const HomePage: React.FC = () => {
   const { id } = useParams();
@@ -140,6 +141,7 @@ const HomePage: React.FC = () => {
 
   const createWidget = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
+    console.log("ok");
     setLoadingCreateWidgets(true);
 
     const city = await getCity();
@@ -195,7 +197,7 @@ const HomePage: React.FC = () => {
         setWidgets([
           {
             id: 0,
-            displayName: "Chez moi",
+            displayName: "Ma position",
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             size: EWidgetSize.MEDIUM,
@@ -213,7 +215,7 @@ const HomePage: React.FC = () => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            displayName: "Chez moi",
+            displayName: "Ma position",
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             size: EWidgetSize.MEDIUM,
@@ -251,15 +253,17 @@ const HomePage: React.FC = () => {
     if (selectedDateRef.current === selectedDate) return;
     selectedDateRef.current = selectedDate;
     getWigets(id);
-  }, [selectedDate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate, id]);
 
   const handleDateChange = (date: Date) => {
     setSelectedDate(date);
   };
 
   return (
-    // set /assets/image/Beautiful Weather.jpg as box background
-    <Box bgImage="url('/assets/image/Beautiful Weather.jpg')" bgSize="cover" bgPosition="center" minH={"100vh"}>
+    <Box>
+      <Image src={bgImage} position={"fixed"} zIndex={-1} />
+
       <Navbar onDateChange={handleDateChange} dashboardName={dashboardUserName} />
 
       <Flex display="flex" justify="space-evenly" flexWrap="wrap" align="center">
@@ -267,20 +271,22 @@ const HomePage: React.FC = () => {
           <Spinner thickness="4px" speed="0.65s" emptyColor="gray.200" color="blue.500" size="xl" />
         ) : widgets.length > 0 ? (
           widgets.map((widget: any, index: number) => (
-            <Widget key={index} widget={widget} index={index} removeWidget={removeWidget} />
+            <Widget key={index} widget={widget} index={index} removeWidget={removeWidget} canBeDeleted={!id} />
           ))
         ) : (
           <Text>Vous n'avez pas encore de widgets.</Text>
         )}
 
-        <WidgetCreation
-          loadingCreateWidgets={loadingCreateWidgets}
-          createWidget={createWidget}
-          taille={taille}
-          setTaille={setTaille}
-          ville={ville}
-          setVille={setVille}
-        />
+        {!id && (
+          <WidgetCreation
+            loadingCreateWidgets={loadingCreateWidgets}
+            createWidget={createWidget}
+            taille={taille}
+            setTaille={setTaille}
+            ville={ville}
+            setVille={setVille}
+          />
+        )}
       </Flex>
     </Box>
   );

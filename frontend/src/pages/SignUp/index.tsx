@@ -193,7 +193,7 @@ const Signup: React.FC = () => {
 
         <Text textAlign="center">
           <Text as="span">Tu as déjà un compte ?</Text>{" "}
-          <Link to="/MeteoPlus/login">
+          <Link to="/login">
             <Text as="span" color="brand.500" textDecoration={"none"} fontWeight={"bold"}>
               Connecte toi !
             </Text>

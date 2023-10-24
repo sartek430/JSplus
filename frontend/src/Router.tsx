@@ -9,7 +9,7 @@ const Router: React.FC = () => (
   <BrowserRouter>
     <Routes>
       <Route
-        path="/MeteoPlus/"
+        path="/MeteoPlus/accueil"
         element={
           <AuthWrapper>
             <HomePage />

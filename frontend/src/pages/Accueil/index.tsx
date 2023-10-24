@@ -254,7 +254,7 @@ const HomePage: React.FC = () => {
     selectedDateRef.current = selectedDate;
     getWigets(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedDate]);
+  }, [selectedDate, id]);
 
   const handleDateChange = (date: Date) => {
     setSelectedDate(date);

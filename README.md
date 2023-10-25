@@ -8,9 +8,9 @@ De plus, les utilisateurs peuvent s'ajouter en contact afin de pouvoir visualise
 
 ## Hébergement
 
-Le site est hébergé sur Vercel, via l'URL suivante : [https://sartek430.github.io/MeteoPlus/](https://meteo-plus.vercel.app/)
+Le site est hébergé sur Vercel, via l'URL suivante : https://meteo-plus.vercel.app
 
-Le back est quant à lui hébergé sur FlyIO, via l'URL suivante : https://meteoplus.fly.dev/
+Le back est quant à lui hébergé sur FlyIO, via l'URL suivante : https://mplusback.fly.dev
 
 ## Projets techniques
 

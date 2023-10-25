@@ -1,16 +1,12 @@
-# fly.toml app configuration file generated for meteoplus on 2023-10-17T13:50:41+02:00
+# fly.toml app configuration file generated for mplusback on 2023-10-25T15:35:50+02:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "meteoplus"
-primary_region = "lhr"
+app = "mplusback"
+primary_region = "cdg"
 
 [build]
-
-[[mounts]]
-  source = "data"
-  destination = "/data"
 
 [http_service]
   internal_port = 3000

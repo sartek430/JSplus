@@ -54,7 +54,7 @@ const Login: React.FC = () => {
         });
         localStorage.setItem("token", response.data.access_token);
         console.log("token :", response.data.access_token);
-        navigate("/accueil");
+        navigate("/MeteoPlus");
       })
       .catch((error) => {
         console.error("Erreur lors de la connection de l'utilisateur :", error);
@@ -137,7 +137,7 @@ const Login: React.FC = () => {
 
         <Text textAlign="center" mt={"30px"}>
           <Text as="span">Tu n'as pas de compte ?</Text>{" "}
-          <Link to="/signup">
+          <Link to="/MeteoPlus/signup">
             <Text as="span" color="brand.500" textDecoration={"none"} fontWeight={"bold"}>
               Inscris toi !
             </Text>

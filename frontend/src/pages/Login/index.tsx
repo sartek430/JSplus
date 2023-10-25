@@ -31,7 +31,7 @@ const Login: React.FC = () => {
 
     axios
       .post(
-        "https://meteoplus.fly.dev/login",
+        "https://mplusback.fly.dev/login",
         {
           email: email,
           password: password,

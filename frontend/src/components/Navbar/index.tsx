@@ -21,6 +21,7 @@ import { Invit } from "../../models/invit.ts";
 import { useNavigate } from "react-router-dom";
 import { FaUserFriends } from "react-icons/fa";
 import ContactModal from "./ContactModal/index.tsx";
+import { Contact } from "../../models/contact.ts";
 
 /**
  * Propriétés attendues par le composant Navbar.
@@ -47,12 +48,14 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }: NavbarPr
   const { isOpen: isInvitModalOpen, onOpen: onInvitModalOpen, onClose: onInvitModalClose } = useDisclosure();
   const { isOpen: isNotifModalOpen, onOpen: onNotifModalOpen, onClose: onNotifModalClose } = useDisclosure();
   const [users, setUsers] = useState<User[]>([]);
+  const [userLoading, setUserLoading] = useState(true);
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
   const { isOpen: isContactModalOpen, onOpen: onContactModalOpen, onClose: onContactModalClose } = useDisclosure();
 
   useEffect(() => {
-    getUsers();
+    refactoUsers();
+    getInvit();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -110,7 +113,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }: NavbarPr
 
     axios
       .post(
-        "https://meteoplus.fly.dev/invits",
+        "https://mplusback.fly.dev/invits",
         {
           email: email,
         },
@@ -142,22 +145,94 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }: NavbarPr
       });
   };
 
+  const deleteContact = async (id: string) => {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(`https://mplusback.fly.dev/contacts/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "ngrok-skip-browser-warning": "*",
+        "Access-Control-Allow-Origin": "*",
+      },
+    });
+
+    await response.json();
+
+    if (response.status === 200) {
+      const newUsers = users.filter((user) => user.contactId !== id);
+      setUsers(newUsers);
+      closeModal();
+    }
+  };
+
+  const refactoUsers = async (): Promise<void> => {
+    const contacts = await getContacts();
+    const users = await getUsers();
+
+    const newUsers = users
+      .filter((user: User) => {
+        const jwt = localStorage.getItem("token");
+        if (!jwt) return false;
+
+        const self = JSON.parse(atob(jwt.split(".")[1]));
+
+        return contacts.some(
+          (contact: Contact) => (contact.userIdA === user.id || contact.userIdB === user.id) && self.id !== user.id,
+        );
+      })
+      .map((user: User) => {
+        const contactId = contacts.find(
+          (contact: Contact) => contact.userIdA === user.id || contact.userIdB === user.id,
+        )?.id;
+        return {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          contactId: contactId,
+        };
+      });
+    setUsers(newUsers);
+    setUserLoading(false);
+  };
+
   /**
    * Récupère la liste des utilisateurs depuis le serveur.
    */
   const getUsers = async () => {
     try {
-      const response = await axios.get("https://meteoplus.fly.dev/users/", {
+      const response = await axios.get("https://mplusback.fly.dev/users/", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
-      setUsers(response.data);
+      return response.data;
     } catch (error: any) {
       console.error("Erreur lors de la récupération des expéditeurs", error);
       toast({
         title: "Erreur lors de la récupération de(s) expéditeur(s)",
+        description: error.response.data.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const getContacts = async (): Promise<any> => {
+    try {
+      const response = await axios.get("https://mplusback.fly.dev/contacts/", {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      });
+      return response.data;
+    } catch (error: any) {
+      console.error("Erreur lors de la récupération des contacts", error);
+      toast({
+        title: "Erreur lors de la récupération de(s) contact(s)",
         description: error.response.data.message,
         status: "error",
         duration: 3000,
@@ -171,7 +246,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }: NavbarPr
    */
   const getInvit = async () => {
     try {
-      const response = await axios.get("https://meteoplus.fly.dev/invits", {
+      const response = await axios.get("https://mplusback.fly.dev/invits", {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -198,7 +273,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }: NavbarPr
   const acceptInvit = async (id: number) => {
     try {
       await axios.patch(
-        `https://meteoplus.fly.dev/invits/${id}`,
+        `https://mplusback.fly.dev/invits/${id}`,
         {
           status: 200,
         },
@@ -237,7 +312,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }: NavbarPr
   const refuseInvit = async (id: number) => {
     try {
       const response = await axios.patch(
-        `https://meteoplus.fly.dev/invits/${id}`,
+        `https://mplusback.fly.dev/invits/${id}`,
         {
           status: 300,
         },
@@ -422,7 +497,14 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }: NavbarPr
         </Box>
       </Flex>
 
-      <ContactModal isContactModalOpen={isContactModalOpen} closeModal={onContactModalClose} users={users} />
+      {userLoading == false && (
+        <ContactModal
+          isContactModalOpen={isContactModalOpen}
+          closeModal={onContactModalClose}
+          users={users}
+          deleteContact={deleteContact}
+        />
+      )}
     </Flex>
   );
 };

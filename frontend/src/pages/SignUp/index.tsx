@@ -21,7 +21,7 @@ const Signup: React.FC = () => {
   const connection = (): void => {
     axios
       .post(
-        "https://meteoplus.fly.dev/login",
+        "https://mplusback.fly.dev/login",
         {
           email: email,
           password: password,
@@ -71,7 +71,7 @@ const Signup: React.FC = () => {
 
     axios
       .post(
-        "https://meteoplus.fly.dev/users",
+        "https://mplusback.fly.dev/users",
         {
           email: email,
           password: password,

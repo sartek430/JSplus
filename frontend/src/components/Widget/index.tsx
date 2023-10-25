@@ -37,7 +37,7 @@ const Widget: React.FC<WidgetProps> = ({ widget, index, removeWidget, canBeDelet
 
     const token = localStorage.getItem("token");
 
-    const response = await fetch(`https://meteoplus.fly.dev/widgets/${widget.id}`, {
+    const response = await fetch(`https://mplusback.fly.dev/widgets/${widget.id}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,

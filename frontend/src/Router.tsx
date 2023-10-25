@@ -9,7 +9,7 @@ const Router: React.FC = () => (
   <BrowserRouter>
     <Routes>
       <Route
-        path="/MeteoPlus"
+        path="/"
         element={
           <AuthWrapper>
             <HomePage />
@@ -17,7 +17,7 @@ const Router: React.FC = () => (
         }
       />{" "}
       <Route
-        path="/MeteoPlus/:id"
+        path="/:id"
         element={
           <AuthWrapper>
             <HomePage />
@@ -25,8 +25,8 @@ const Router: React.FC = () => (
         }
       />
       {/** HomePage */}
-      <Route path="/MeteoPlus/login" element={<Login />} /> {/** Login page */}
-      <Route path="/MeteoPlus/signup" element={<Signup />} /> {/** Signup page */}
+      <Route path="/login" element={<Login />} /> {/** Login page */}
+      <Route path="/signup" element={<Signup />} /> {/** Signup page */}
       <Route path="*" element={<NotFound />} /> {/* Route 404 */}
     </Routes>
   </BrowserRouter>

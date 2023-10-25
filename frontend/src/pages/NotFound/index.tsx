@@ -8,7 +8,7 @@ const NotFound: React.FC = () => {
     <Box>
       <Text>404</Text>
       <Text>Page not found</Text>
-      <Button onClick={() => navigate("/MeteoPlus")}>Retour en arrière</Button>
+      <Button onClick={() => navigate("/")}>Retour en arrière</Button>
     </Box>
   );
 };

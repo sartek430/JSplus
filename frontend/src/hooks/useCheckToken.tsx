@@ -19,11 +19,11 @@ const AuthWrapper: React.FC<AuthWrapperProps> = ({ children }) => {
         if (isTokenExpired || token === null) {
           localStorage.removeItem("token");
         }
-        navigate("MeteoPlus/login");
+        navigate("/login");
       }
     } catch (error) {
       console.error(error);
-      navigate("/MeteoPlus/login");
+      navigate("/login");
       localStorage.removeItem("token");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

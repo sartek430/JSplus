@@ -382,7 +382,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }: NavbarPr
         <Button
           onClick={() => {
             localStorage.removeItem("token");
-            navigate("/MeteoPlus/login");
+            navigate("/login");
           }}
           fontSize={20}
           bg={"none"}

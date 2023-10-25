@@ -107,7 +107,7 @@ export default function ContactModal({ isContactModalOpen, closeModal, users }: 
                   </Flex>
                 </Flex>
               ))}
-            {window.location.pathname !== "/MeteoPlus" && (
+            {window.location.pathname !== "/" && (
               <Button
                 mt={1}
                 w={100}
@@ -120,7 +120,7 @@ export default function ContactModal({ isContactModalOpen, closeModal, users }: 
                 _active={{ transform: "scale(0.9)" }}
                 alignSelf={"end"}
                 onClick={() => {
-                  navigate("/MeteoPlus"), closeModal();
+                  navigate("/"), closeModal();
                 }}
               >
                 Retour

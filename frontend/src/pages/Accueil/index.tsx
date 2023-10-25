@@ -73,7 +73,7 @@ const HomePage: React.FC = () => {
 
     setLoadingWidgets(false);
 
-    if (widgets.length === 0) {
+    if (id && widgets.length === 0) {
       createDefaultWidget();
       return;
     }
@@ -273,7 +273,7 @@ const HomePage: React.FC = () => {
             <Widget key={index} widget={widget} index={index} removeWidget={removeWidget} canBeDeleted={!id} />
           ))
         ) : (
-          <Text>Vous n'avez pas encore de widgets.</Text>
+          <Text>{!id ? "L'utilisateur n'a pas encore crée de widget" : "Vous n'avez pas encore de widgets !"}</Text>
         )}
 
         {!id && (

@@ -472,7 +472,7 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }: NavbarPr
           Se deconnecter
         </Button>
 
-        <Box _hover={{ cursor: "pointer" }} onClick={onContactModalOpen} mr={10} mt={Invits.length > 0 ? -5 : 0}>
+        <Box _hover={{ cursor: "pointer" }} onClick={onContactModalOpen} mr={10}>
           <FaUserFriends size={30} color={"#000000"} />
         </Box>
 

@@ -31,7 +31,7 @@ const HomePage: React.FC = () => {
     const token = localStorage.getItem("token");
 
     if (id) {
-      const userResponse = await fetch(`https://meteoplus.fly.dev/users`, {
+      const userResponse = await fetch(`https://mplusback.fly.dev/users`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -55,7 +55,7 @@ const HomePage: React.FC = () => {
       setDashboardUserName(user.name);
       widgets.push(...user.widgets);
     } else {
-      const response = await fetch("https://meteoplus.fly.dev/widgets", {
+      const response = await fetch("https://mplusback.fly.dev/widgets", {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -141,7 +141,6 @@ const HomePage: React.FC = () => {
 
   const createWidget = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
     e.preventDefault();
-    console.log("ok");
     setLoadingCreateWidgets(true);
 
     const city = await getCity();
@@ -161,7 +160,7 @@ const HomePage: React.FC = () => {
 
     const token = localStorage.getItem("token");
 
-    await fetch("https://meteoplus.fly.dev/widgets", {
+    await fetch("https://mplusback.fly.dev/widgets", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -206,7 +205,7 @@ const HomePage: React.FC = () => {
 
         const token = localStorage.getItem("token");
 
-        await fetch("https://meteoplus.fly.dev/widgets", {
+        await fetch("https://mplusback.fly.dev/widgets", {
           method: "POST",
           headers: {
             Authorization: `Bearer ${token}`,

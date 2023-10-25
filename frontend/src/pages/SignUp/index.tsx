@@ -43,7 +43,7 @@ const Signup: React.FC = () => {
           isClosable: true,
         });
         localStorage.setItem("token", response.data.token);
-        navigate("/MeteoPlus/accueil");
+        navigate("/MeteoPlus");
       })
       .catch((error) => {
         console.error("Erreur lors de la connection de l'utilisateur :", error);

@@ -145,6 +145,11 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }: NavbarPr
       });
   };
 
+  /**
+   * Supprime un contact spécifié par son identifiant.
+   *
+   * @param {string} id - Identifiant du contact à supprimer.
+   */
   const deleteContact = async (id: string) => {
     const token = localStorage.getItem("token");
 
@@ -166,6 +171,9 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }: NavbarPr
     }
   };
 
+  /**
+   * Récupère la liste des utilisateurs et des contacts depuis le serveur. Puis, les filtre et met à jour la liste des utilisateurs
+   */
   const refactoUsers = async (): Promise<void> => {
     const contacts = await getContacts();
     const users = await getUsers();
@@ -220,6 +228,9 @@ const Navbar: React.FC<NavbarProps> = ({ onDateChange, dashboardName }: NavbarPr
     }
   };
 
+  /**
+   * Récupère la liste des contacts depuis le serveur.
+   */
   const getContacts = async (): Promise<any> => {
     try {
       const response = await axios.get("https://mplusback.fly.dev/contacts/", {

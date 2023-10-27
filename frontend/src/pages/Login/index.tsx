@@ -8,6 +8,8 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -18,6 +20,8 @@ const Login: React.FC = () => {
   };
 
   const connection = async (): Promise<void> => {
+    setLoginLoading(true);
+
     if (email === "" || password === "") {
       toast({
         title: "Erreur lors de la connection de l'utilisateur",
@@ -26,6 +30,7 @@ const Login: React.FC = () => {
         duration: 3000,
         isClosable: true,
       });
+      setLoginLoading(false);
       return;
     }
 
@@ -54,6 +59,7 @@ const Login: React.FC = () => {
 
       localStorage.setItem("token", response.data.access_token);
 
+      setLoginLoading(false);
       navigate("/");
     } catch (error: any) {
       toast({
@@ -63,6 +69,8 @@ const Login: React.FC = () => {
         duration: 3000,
         isClosable: true,
       });
+
+      setLoginLoading(false);
     }
   };
 
@@ -154,6 +162,7 @@ const Login: React.FC = () => {
           }}
           _active={{ transform: "scale(0.9)" }}
           boxShadow={"-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"}
+          isLoading={loginLoading}
           onClick={connection}
         >
           Connexion !

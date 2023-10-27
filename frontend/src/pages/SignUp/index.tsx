@@ -9,6 +9,7 @@ const Signup: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [registerLoading, setRegisterLoading] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -42,6 +43,7 @@ const Signup: React.FC = () => {
         isClosable: true,
       });
       localStorage.setItem("token", response.data.access_token);
+      setRegisterLoading(false);
       navigate("/");
     } catch (error: any) {
       console.error("Erreur lors de la connection de l'utilisateur :", error);
@@ -52,10 +54,12 @@ const Signup: React.FC = () => {
         duration: 3000,
         isClosable: true,
       });
+      setRegisterLoading(false);
     }
   };
 
   const createAcount = async (): Promise<void> => {
+    setRegisterLoading(true);
     if (email === "" || password === "" || username === "") {
       toast({
         title: "Erreur lors de la création de l'utilisateur",
@@ -64,6 +68,7 @@ const Signup: React.FC = () => {
         duration: 3000,
         isClosable: true,
       });
+      setRegisterLoading(false);
       return;
     }
 
@@ -99,6 +104,7 @@ const Signup: React.FC = () => {
         duration: 3000,
         isClosable: true,
       });
+      setRegisterLoading(false);
     }
   };
 

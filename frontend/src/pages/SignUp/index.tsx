@@ -9,6 +9,7 @@ const Signup: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
+  const [registerLoading, setRegisterLoading] = useState(false);
   const toast = useToast();
   const navigate = useNavigate();
 
@@ -18,13 +19,13 @@ const Signup: React.FC = () => {
     }
   };
 
-  const connection = (): void => {
-    axios
-      .post(
+  const connection = async (): Promise<void> => {
+    try {
+      const response = await axios.post(
         "https://mplusback.fly.dev/login",
         {
-          email: email,
-          password: password,
+          email,
+          password,
         },
         {
           headers: {
@@ -33,31 +34,32 @@ const Signup: React.FC = () => {
             "ngrok-skip-browser-warning": "*",
           },
         },
-      )
-      .then((response) => {
-        console.log("Utilisateur connecté :", response.data);
-        toast({
-          title: "Utilisateur connecté avec succès",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        localStorage.setItem("token", response.data.token);
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la connection de l'utilisateur :", error);
-        toast({
-          title: "Erreur lors de la connection de l'utilisateur",
-          description: error.response.data.message,
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+      );
+
+      toast({
+        title: "Utilisateur connecté avec succès",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
       });
+      localStorage.setItem("token", response.data.access_token);
+      setRegisterLoading(false);
+      navigate("/");
+    } catch (error: any) {
+      console.error("Erreur lors de la connection de l'utilisateur :", error);
+      toast({
+        title: "Erreur lors de la connection de l'utilisateur",
+        description: error.response.data.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      setRegisterLoading(false);
+    }
   };
 
-  const createAcount = (): void => {
+  const createAcount = async (): Promise<void> => {
+    setRegisterLoading(true);
     if (email === "" || password === "" || username === "") {
       toast({
         title: "Erreur lors de la création de l'utilisateur",
@@ -66,15 +68,16 @@ const Signup: React.FC = () => {
         duration: 3000,
         isClosable: true,
       });
+      setRegisterLoading(false);
       return;
     }
 
-    axios
-      .post(
+    try {
+      await axios.post(
         "https://mplusback.fly.dev/users",
         {
-          email: email,
-          password: password,
+          email,
+          password,
           name: username,
         },
         {
@@ -84,28 +87,25 @@ const Signup: React.FC = () => {
             "ngrok-skip-browser-warning": "*",
           },
         },
-      )
-      .then((response) => {
-        // Gérer la réponse réussie ici
-        console.log("Utilisateur créé :", response.data);
-        toast({
-          title: "Utilisateur créé avec succès",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        connection();
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la création de l'utilisateur :", error.message);
-        toast({
-          title: "Erreur lors de la création de l'utilisateur",
-          description: error.response.data.message[0],
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+      );
+      toast({
+        title: "Utilisateur créé avec succès",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
       });
+      connection();
+    } catch (error: any) {
+      console.error("Erreur lors de la création de l'utilisateur :", error.message);
+      toast({
+        title: "Erreur lors de la création de l'utilisateur",
+        description: error.response.data.message[0],
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+      setRegisterLoading(false);
+    }
   };
 
   return (

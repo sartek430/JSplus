@@ -8,6 +8,8 @@ const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loginLoading, setLoginLoading] = useState(false);
+
   const navigate = useNavigate();
   const toast = useToast();
 
@@ -17,7 +19,9 @@ const Login: React.FC = () => {
     }
   };
 
-  const connection = (): void => {
+  const connection = async (): Promise<void> => {
+    setLoginLoading(true);
+
     if (email === "" || password === "") {
       toast({
         title: "Erreur lors de la connection de l'utilisateur",
@@ -26,11 +30,12 @@ const Login: React.FC = () => {
         duration: 3000,
         isClosable: true,
       });
+      setLoginLoading(false);
       return;
     }
 
-    axios
-      .post(
+    try {
+      const response = await axios.post(
         "https://mplusback.fly.dev/login",
         {
           email: email,
@@ -43,29 +48,30 @@ const Login: React.FC = () => {
             "ngrok-skip-browser-warning": "*",
           },
         },
-      )
-      .then((response) => {
-        console.log("Utilisateur connecté :", response.data);
-        toast({
-          title: "Utilisateur connecté avec succès",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        localStorage.setItem("token", response.data.access_token);
-        console.log("token :", response.data.access_token);
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la connection de l'utilisateur :", error);
-        toast({
-          title: "Erreur lors de la connection de l'utilisateur",
-          description: error.response.data.message,
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+      );
+
+      toast({
+        title: "Utilisateur connecté avec succès",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
       });
+
+      localStorage.setItem("token", response.data.access_token);
+
+      setLoginLoading(false);
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "Erreur lors de la connection de l'utilisateur",
+        description: error.response.data.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+
+      setLoginLoading(false);
+    }
   };
 
   return (
@@ -156,6 +162,7 @@ const Login: React.FC = () => {
           }}
           _active={{ transform: "scale(0.9)" }}
           boxShadow={"-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"}
+          isLoading={loginLoading}
           onClick={connection}
         >
           Connexion !

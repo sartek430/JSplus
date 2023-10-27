@@ -17,7 +17,7 @@ const Login: React.FC = () => {
     }
   };
 
-  const connection = (): void => {
+  const connection = async (): Promise<void> => {
     if (email === "" || password === "") {
       toast({
         title: "Erreur lors de la connection de l'utilisateur",
@@ -29,8 +29,8 @@ const Login: React.FC = () => {
       return;
     }
 
-    axios
-      .post(
+    try {
+      const response = await axios.post(
         "https://mplusback.fly.dev/login",
         {
           email: email,
@@ -43,29 +43,27 @@ const Login: React.FC = () => {
             "ngrok-skip-browser-warning": "*",
           },
         },
-      )
-      .then((response) => {
-        console.log("Utilisateur connecté :", response.data);
-        toast({
-          title: "Utilisateur connecté avec succès",
-          status: "success",
-          duration: 3000,
-          isClosable: true,
-        });
-        localStorage.setItem("token", response.data.access_token);
-        console.log("token :", response.data.access_token);
-        navigate("/");
-      })
-      .catch((error) => {
-        console.error("Erreur lors de la connection de l'utilisateur :", error);
-        toast({
-          title: "Erreur lors de la connection de l'utilisateur",
-          description: error.response.data.message,
-          status: "error",
-          duration: 3000,
-          isClosable: true,
-        });
+      );
+
+      toast({
+        title: "Utilisateur connecté avec succès",
+        status: "success",
+        duration: 3000,
+        isClosable: true,
       });
+
+      localStorage.setItem("token", response.data.access_token);
+
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "Erreur lors de la connection de l'utilisateur",
+        description: error.response.data.message,
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    }
   };
 
   return (

@@ -212,6 +212,7 @@ const Signup: React.FC = () => {
           }}
           _active={{ transform: "scale(0.9)" }}
           boxShadow={"-20px 20px 60px #bebebe, 20px -20px 60px #ffffff"}
+          isLoading={registerLoading}
           onClick={createAcount}
         >
           Créer ton compte !

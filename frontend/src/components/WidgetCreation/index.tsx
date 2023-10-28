@@ -49,12 +49,11 @@ const WidgetCreation: React.FC<WidgetCreationProps> = ({ loadingCreateWidgets, c
               </FormLabel>
               <Select
                 size={"xs"}
-                placeholder="Select option"
+                placeholder="Choisir la taille"
                 borderColor={"#0E487D"}
                 focusBorderColor="#0E487D"
                 _hover={{ borderColor: "#0E487D" }}
                 onChange={(e) => setTaille(e.target.value)}
-                value={"SMALL"}
               >
                 <option value="SMALL">Petit</option>
                 <option value="MEDIUM">Grand</option>
